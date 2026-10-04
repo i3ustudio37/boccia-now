@@ -3,6 +3,7 @@
 import { Icon } from "./brand";
 import { DirectionSectors } from "./direction-chart";
 import { BALL_DIAMETER, getBallPoint, getLabelPoint, type CourtView } from "@/lib/compass";
+import { getDirectionSector } from "@/lib/direction-chart";
 import type { Color, Direction, Distance } from "@/lib/practice";
 
 export const DIRECTION_LABELS: { value: Direction; label: string }[] = [
@@ -52,6 +53,12 @@ export function CourtCompass({ color, distance, direction, courtView, onDirectio
       </div>
       <div className={`compass court-compass ${color}`} role="group" aria-label="八方位落點" data-view={courtView}>
         <svg className="court-diagram" viewBox="0 0 400 400" aria-hidden="true">
+          {DIRECTION_LABELS.map(d => <path key={d.value}
+            data-sector-hit={d.value}
+            className={`court-sector-hit${direction === d.value ? " selected" : ""}`}
+            d={getDirectionSector(d.value, 1, 1, courtView, 199).path}
+            onClick={() => onDirectionChange(d.value)}
+          />)}
           {counts && <DirectionSectors counts={counts} courtView={courtView} />}
           <circle className="court-ring" cx="200" cy="200" r="152" />
           {Array.from({ length: 8 }, (_, index) => {

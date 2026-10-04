@@ -60,3 +60,44 @@ body{line-height:var(--lh-normal)}.eyebrow{color:var(--text-subtle);font-family:
 
 .live-counts{gap:12px}.live-counts span+span{padding-left:12px}.live-counts b{font-size:16px;margin:0 2px}
 @media(max-width:760px){.live-counts{gap:0;font-size:11px}.live-counts span+span{padding-left:0}.live-counts b{font-size:17px}}
+
+/* Ball-first selection and a court drawn in one coordinate system. */
+.color-choices{justify-content:center;gap:48px}
+.color-choice,.color-choice.red.selected,.color-choice.blue.selected{position:relative;flex:0 0 76px;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:5px;border:0;background:transparent;color:var(--text-muted);min-height:0}
+.color-choice:hover{background:transparent}
+.color-choice .ball{display:grid;place-items:center;width:50px;height:50px;border:0;box-shadow:none;color:var(--on-accent);opacity:.7}
+.color-choice .ball svg{margin:0}
+.color-choice.selected .ball{opacity:1;outline:2px solid var(--text);outline-offset:3px}
+.color-choice.selected .ball-choice-label{color:var(--text)}
+.ball-choice-label{font-size:11px;line-height:1.2;font-weight:400}
+.distance-example{width:80px;height:20px;display:block;overflow:visible}
+.example-jack,.white-ball{fill:var(--text)}
+.distance-example.red .example-color,.color-ball.red{fill:var(--ball-red)}
+.distance-example.blue .example-color,.color-ball.blue{fill:var(--ball-blue)}
+.court-view-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding:4px 6px;font-size:11px;line-height:1.2;border:1px solid var(--border-strong);border-radius:var(--radius-xs);color:var(--text-muted);white-space:nowrap}
+.court-view-toggle:hover{background:var(--surface-3);color:var(--text)}
+.court-stage{position:relative;padding-inline:36px}
+.court-compass{max-width:100%}.court-compass .direction-button{width:40px;height:34px;min-height:34px;font-size:12px;padding:0;white-space:nowrap}
+.court-diagram{width:100%;height:100%;display:block;pointer-events:none}
+.court-ring{fill:none;stroke:var(--border-strong);stroke-width:1}
+.court-sector{stroke:var(--border);stroke-width:1;stroke-dasharray:3 5}
+.diagram-ball{stroke:none}
+.throw-axis{position:absolute;left:0;top:50%;transform:translateY(-50%);width:32px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text-muted);pointer-events:none}
+.throw-axis span{font-size:10px;line-height:1.25;text-align:center;white-space:nowrap}
+.throw-axis svg{width:18px;height:62px;stroke:var(--text-muted);stroke-width:1.6;fill:none}
+.throw-axis small{font-size:9px;white-space:nowrap;margin:0 0 6px}
+.court-view-note{text-align:center;font-size:10px;line-height:1.5;color:var(--text-subtle);margin-top:3px}
+.dock-round{padding-right:7px;border-right:1px solid var(--border-strong);color:var(--text)}
+.quick-undo{width:28px;height:28px;min-width:28px;margin-left:6px}.record-panel .live-counts{flex:1}
+@media(max-width:760px){
+ .color-choices{gap:42px}.color-choice{flex-basis:70px;padding:4px;gap:5px}.color-choice .ball{width:42px;height:42px}.ball-choice-label{font-size:10px}
+ .distance-example{width:72px;height:18px}.court-stage{padding-inline:32px}.throw-axis{width:29px}.throw-axis span{font-size:9px}.throw-axis svg{height:54px}
+ .court-view-toggle{font-size:10px;padding:3px 5px}.direction-field legend{align-items:center}.court-compass{width:clamp(168px,calc(100dvh - 552px),224px)}
+ .court-compass .direction-button{width:40px;height:34px;min-height:34px;font-size:12px;padding:0;white-space:nowrap}.court-view-note{font-size:9px;margin-top:2px}
+}
+
+@media(max-width:760px){.record-panel .section-heading{display:flex;align-items:center}.live-counts{font-size:10px}.live-counts b{font-size:16px}}
+
+.court-diagram .direction-chart-sector{fill-opacity:.45;stroke-opacity:.6}.court-diagram .direction-chart-sector.is-highest{fill-opacity:.42;stroke-opacity:.6}
+
+@media(max-width:760px) and (max-height:760px){.court-compass .direction-button{width:30px;height:28px;min-height:28px;font-size:11px}}

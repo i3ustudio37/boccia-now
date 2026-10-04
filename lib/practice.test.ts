@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  addPickup, addThrow, elapsedMs, endSession, getStats, newSession,
+  addPickup, addThrow, elapsedMs, endSession, getOnCourtThrows, getRounds, getStats, newSession,
   parseSessions, pauseSession, resumeSession, undoLastEvent,
-  type PracticeSession, type ThrowInput,
+  type PickupInput, type PracticeSession, type ThrowInput,
 } from "./practice";
 
 const red: ThrowInput = { color: "red", distance: "touch", direction: "long-left" };
@@ -128,4 +128,134 @@ test("parser validates running and paused sessions after several timer transitio
   assert.equal(elapsedMs(session, 330), 70);
   const malformed: PracticeSession = { ...session, accumulatedMs: 1 };
   assert.throws(() => parseSessions([malformed]));
+});
+
+test("each pickup creates a separate round with its own results and success rates", () => {
+  let session = addThrow(newSession(0, "session"), red, 1, "touch");
+  session = addThrow(session, { ...red, distance: "near" }, 2, "near");
+  session = addThrow(session, blue, 3, "far");
+  session = addPickup(session, { red: 2, blue: 1, throwIds: ["touch", "near", "far"] }, 4, "round-1");
+  session = addThrow(session, blue, 5, "far-2");
+  session = addThrow(session, blue, 6, "far-3");
+  session = addPickup(session, { red: 0, blue: 2, throwIds: ["far-2", "far-3"] }, 7, "round-2");
+  session = addThrow(session, red, 8, "pending");
+  const rounds = getRounds(session);
+  assert.deepEqual(rounds.map(round => [round.id, round.number, round.pickup?.id ?? null]), [
+    ["round-1", 1, "round-1"], ["round-2", 2, "round-2"], ["session:pending", 3, null],
+  ]);
+  assert.deepEqual(rounds[0].stats.byDistance, { touch: 1, near: 1, far: 1 });
+  assert.equal(rounds[0].stats.touchRate, 1 / 3 * 100);
+  assert.equal(rounds[0].stats.closeRate, 2 / 3 * 100);
+  assert.equal(rounds[1].stats.closeRate, 0);
+  assert.equal(rounds[2].stats.closeRate, 100);
+  assert.deepEqual(rounds.map(round => round.stats.totalThrows), [3, 2, 1]);
+  assert.deepEqual(rounds.map(round => round.inferred), [false, false, false]);
+  assert.equal(getStats(session).closeRate, 50, "total average is distinct from individual round rates");
+  assert.equal(new Set(rounds.flatMap(round => round.throws.map(event => event.id))).size, 6);
+});
+
+test("partial pickups assign exact mixed-color throws, including balls left from a previous pickup", () => {
+  let session = addThrow(newSession(0, "session"), red, 1, "old-red-touch");
+  session = addThrow(session, { ...red, distance: "far" }, 2, "red-far");
+  session = addThrow(session, { ...blue, distance: "near" }, 3, "blue-near");
+  const input: PickupInput = { red: 1, blue: 1, throwIds: ["blue-near", "red-far"] };
+  session = addPickup(session, input, 4, "round-1");
+  input.throwIds!.push("changed-after-save");
+  assert.deepEqual(getOnCourtThrows(session).map(event => event.id), ["old-red-touch"]);
+  assert.deepEqual(getRounds(session)[0].throws.map(event => event.id), ["red-far", "blue-near"]);
+  assert.equal(getRounds(session)[0].stats.closeRate, 50);
+  session = addThrow(session, { ...red, distance: "near" }, 5, "new-red-near");
+  session = addPickup(session, { red: 2, blue: 0, throwIds: ["old-red-touch", "new-red-near"] }, 6, "round-2");
+  const rounds = getRounds(session);
+  assert.equal(rounds.length, 2, "an empty pending round is omitted");
+  assert.equal(rounds[1].stats.closeRate, 100);
+  assert.equal(rounds[1].stats.touchRate, 50);
+  assert.deepEqual(rounds[1].throws.map(event => event.id), ["old-red-touch", "new-red-near"]);
+  assert.deepEqual(getOnCourtThrows(session), []);
+  assert.deepEqual(parseSessions(JSON.parse(JSON.stringify([session]))), [session]);
+});
+
+test("legacy partial pickup inference follows FIFO and carries uncertainty into remaining balls", () => {
+  let session = addThrow(newSession(0, "session"), red, 1, "red-touch");
+  session = addThrow(session, { ...red, distance: "far" }, 2, "red-far");
+  session = addThrow(session, blue, 3, "blue-far");
+  session = addPickup(session, { red: 1, blue: 0 }, 4, "legacy-partial");
+  let rounds = getRounds(session);
+  assert.deepEqual(rounds[0].throws.map(event => event.id), ["red-touch"]);
+  assert.equal(rounds[0].inferred, true);
+  assert.equal(rounds[1].inferred, true, "remaining same-color balls are also uncertain");
+  session = addPickup(session, { red: 0, blue: 1 }, 5, "legacy-blue-all");
+  session = addPickup(session, { red: 1, blue: 0 }, 6, "legacy-red-rest");
+  rounds = getRounds(session);
+  assert.deepEqual(rounds.map(round => round.inferred), [true, false, true]);
+  assert.deepEqual(rounds.map(round => round.throws.map(event => event.id)), [["red-touch"], ["blue-far"], ["red-far"]]);
+  const [restored] = parseSessions(JSON.parse(JSON.stringify([session])));
+  assert.deepEqual(getRounds(restored), rounds);
+  assert.equal("throwIds" in restored.events[3], false, "import must not pretend inferred legacy IDs were explicit");
+});
+
+test("a legacy full pickup assigns the complete round without uncertainty", () => {
+  let session = addThrow(newSession(0, "session"), red, 1, "red");
+  session = addThrow(session, blue, 2, "blue");
+  session = addPickup(session, { red: 1, blue: 1 }, 3, "pickup");
+  assert.equal(getRounds(session)[0].inferred, false);
+  assert.equal(getRounds(session)[0].stats.closeRate, 50);
+});
+
+test("pickup ID validation rejects duplicates, missing or consumed throws, and color count mismatches", () => {
+  let session = addThrow(newSession(0, "session"), red, 1, "red-1");
+  session = addThrow(session, red, 2, "red-2");
+  session = addThrow(session, blue, 3, "blue-1");
+  session = addPickup(session, { red: 1, blue: 0, throwIds: ["red-1"] }, 4, "picked");
+  const invalid = [
+    { red: 1, blue: 0, throwIds: ["red-2", "red-2"] },
+    { red: 1, blue: 0, throwIds: ["not-a-throw"] },
+    { red: 1, blue: 0, throwIds: ["red-1"] },
+    { red: 1, blue: 0, throwIds: ["blue-1"] },
+    { red: 1, blue: 1, throwIds: ["red-2"] },
+    { red: 1, blue: 0, throwIds: [] },
+    { red: 1, blue: 0, throwIds: [""] },
+    { red: 1, blue: 0, throwIds: [42] },
+    { red: 1, blue: 0, throwIds: "red-2" },
+    { red: 1, blue: 0, throwIds: null },
+  ];
+  for (const input of invalid) assert.throws(() => addPickup(session, input as PickupInput, 5, "invalid"));
+});
+
+test("backup parser validates pickup IDs at their original event time", () => {
+  let session = addThrow(newSession(0, "session"), red, 1, "red-1");
+  session = addThrow(session, red, 2, "red-2");
+  session = addThrow(session, blue, 3, "blue-1");
+  session = addPickup(session, { red: 1, blue: 0, throwIds: ["red-1"] }, 4, "pickup-1");
+  session = addPickup(session, { red: 1, blue: 1, throwIds: ["red-2", "blue-1"] }, 5, "pickup-2");
+  session = addThrow(session, red, 6, "future-red");
+  for (const throwIds of [["red-2", "red-2"], ["red-1", "blue-1"], ["foreign", "blue-1"], ["future-red", "blue-1"], ["red-2"], [], null, "red-2"]) {
+    const events = session.events.map(event => event.id === "pickup-2" ? { ...event, throwIds } : event);
+    assert.throws(() => parseSessions([{ ...session, events }]), JSON.stringify(throwIds));
+  }
+  const [restored] = parseSessions([session]);
+  assert.deepEqual(restored, session);
+  const originalPickup = session.events[4];
+  const restoredPickup = restored.events[4];
+  assert(originalPickup.type === "pickup" && restoredPickup.type === "pickup");
+  assert.notEqual(restoredPickup.throwIds, originalPickup.throwIds, "imported ID arrays are detached");
+});
+
+test("undo and reload reconstruct round membership and ending does not collect pending balls", () => {
+  assert.deepEqual(getRounds(newSession(0, "empty")), []);
+  let session = addThrow(newSession(0, "session"), red, 1, "red");
+  session = addThrow(session, blue, 2, "blue");
+  session = addPickup(session, { red: 1, blue: 0, throwIds: ["red"] }, 3, "round-1");
+  session = addPickup(session, { red: 0, blue: 1, throwIds: ["blue"] }, 4, "round-2");
+  const [restored] = parseSessions(JSON.parse(JSON.stringify([session])));
+  const undone = undoLastEvent(restored, 5);
+  assert.equal(getRounds(undone).length, 2);
+  assert.equal(getRounds(undone)[1].pickup, null);
+  assert.deepEqual(getOnCourtThrows(undone).map(event => event.id), ["blue"]);
+  const stablePendingId = getRounds(undone)[1].id;
+  const ended = endSession(undone, 6);
+  assert.equal(getRounds(ended)[1].id, stablePendingId);
+  assert.equal(getRounds(ended)[1].pickup, null);
+  assert.equal(getRounds(ended).filter(round => round.pickup !== null).length, 1);
+  assert.deepEqual(getOnCourtThrows(ended).map(event => event.id), ["blue"]);
 });

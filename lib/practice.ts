@@ -8,7 +8,7 @@ export type Direction = (typeof DIRECTIONS)[number];
 export type SessionStatus = "running" | "paused" | "ended";
 
 export interface ThrowInput { color: Color; distance: Distance; direction: Direction }
-export interface PickupInput { red: number; blue: number }
+export interface PickupInput { red: number; blue: number; throwIds?: string[] }
 interface EventBase { id: string; timestamp: number; elapsedMs: number }
 export interface ThrowEvent extends EventBase, ThrowInput { type: "throw" }
 export interface PickupEvent extends EventBase, PickupInput { type: "pickup" }
@@ -37,6 +37,16 @@ export interface PracticeStats {
   closeRate: number;
 }
 
+export interface PracticeRound {
+  id: string;
+  number: number;
+  pickup: PickupEvent | null;
+  throws: ThrowEvent[];
+  stats: PracticeStats;
+  /** Legacy quantity-only pickups can leave the exact ball assignments uncertain. */
+  inferred: boolean;
+}
+
 function fail(message: string): never { throw new Error(message); }
 function integer(value: unknown, label: string): asserts value is number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) fail(`${label}必須是非負整數`);
@@ -60,6 +70,42 @@ function validatePickup(input: PickupInput) {
   integer(input.red, "紅球數量");
   integer(input.blue, "藍球數量");
   if (input.red === 0 && input.blue === 0) fail("請選擇至少一顆收回的球");
+  if (input.throwIds !== undefined) {
+    if (!Array.isArray(input.throwIds)) fail("收回球的投擲 ID 必須是陣列");
+    const ids = new Set<string>();
+    for (const id of input.throwIds) {
+      identifier(id);
+      if (ids.has(id)) fail("收回球的投擲 ID 不可重複");
+      ids.add(id);
+    }
+  }
+}
+
+/** Resolve old quantity-only pickups by color in throw order; new records use exact IDs. */
+function resolvePickup(onCourt: readonly ThrowEvent[], input: PickupInput): { throws: ThrowEvent[]; ambiguousIds: string[] } {
+  validatePickup(input);
+  const counts = { red: 0, blue: 0 };
+  for (const event of onCourt) counts[event.color]++;
+  if (input.red > counts.red || input.blue > counts.blue) fail("收回數量不能超過場上的紅球或藍球");
+  if (input.throwIds !== undefined) {
+    const ids = new Set(input.throwIds);
+    const picked = onCourt.filter(event => ids.has(event.id));
+    if (picked.length !== ids.size) fail("撿球紀錄引用不在場上的投擲紀錄");
+    const selected = { red: 0, blue: 0 };
+    for (const event of picked) selected[event.color]++;
+    if (selected.red !== input.red || selected.blue !== input.blue) fail("收回球的投擲 ID 與紅藍球數量不一致");
+    return { throws: picked, ambiguousIds: [] };
+  }
+  const remaining = { red: input.red, blue: input.blue };
+  const picked = onCourt.filter(event => {
+    if (remaining[event.color] === 0) return false;
+    remaining[event.color]--;
+    return true;
+  });
+  const ambiguousIds = onCourt
+    .filter(event => input[event.color] > 0 && input[event.color] < counts[event.color])
+    .map(event => event.id);
+  return { throws: picked, ambiguousIds };
 }
 function mutationTime(session: PracticeSession, now: number) {
   integer(now, "時間");
@@ -99,10 +145,10 @@ export function addPickup(session: PracticeSession, input: PickupInput, now: num
   active(session);
   mutationTime(session, now);
   uniqueEvent(session, eventId);
-  validatePickup(input);
-  const { onCourt } = getStats(session);
-  if (input.red > onCourt.red || input.blue > onCourt.blue) fail("收回數量不能超過場上的紅球或藍球");
-  const event: PickupEvent = { id: eventId, type: "pickup", timestamp: now, elapsedMs: elapsedMs(session, now), red: input.red, blue: input.blue };
+  resolvePickup(getOnCourtThrows(session), input);
+  const event: PickupEvent = { id: eventId, type: "pickup", timestamp: now, elapsedMs: elapsedMs(session, now), red: input.red, blue: input.blue,
+    ...(input.throwIds === undefined ? {} : { throwIds: [...input.throwIds] }),
+  };
   return { ...session, events: [...session.events, event] };
 }
 
@@ -161,6 +207,48 @@ export function getStats(session: PracticeSession): PracticeStats {
   return stats;
 }
 
+/** A pickup completes one round containing exactly the throws for the balls collected. */
+export function getRounds(session: PracticeSession): PracticeRound[] {
+  const rounds: PracticeRound[] = [];
+  let onCourt: ThrowEvent[] = [];
+  const uncertainIds = new Set<string>();
+  for (const event of session.events) {
+    if (event.type === "throw") {
+      onCourt.push(event);
+      continue;
+    }
+    const resolved = resolvePickup(onCourt, event);
+    for (const id of resolved.ambiguousIds) uncertainIds.add(id);
+    const pickedIds = new Set(resolved.throws.map(picked => picked.id));
+    rounds.push({
+      id: event.id,
+      number: rounds.length + 1,
+      pickup: event,
+      throws: resolved.throws,
+      stats: getStats({ ...session, events: [...resolved.throws, event] }),
+      inferred: resolved.throws.some(picked => uncertainIds.has(picked.id)),
+    });
+    onCourt = onCourt.filter(pending => !pickedIds.has(pending.id));
+  }
+  if (onCourt.length) {
+    rounds.push({
+      id: `${session.id}:pending`,
+      number: rounds.length + 1,
+      pickup: null,
+      throws: onCourt,
+      stats: getStats({ ...session, events: onCourt }),
+      inferred: onCourt.some(pending => uncertainIds.has(pending.id)),
+    });
+  }
+  return rounds;
+}
+
+/** Remaining throws, in their original throw order, available for the next pickup. */
+export function getOnCourtThrows(session: PracticeSession): ThrowEvent[] {
+  const latest = getRounds(session).at(-1);
+  return latest?.pickup === null ? latest.throws : [];
+}
+
 /** Validate untrusted JSON and return detached, canonical session objects. */
 export function parseSessions(value: unknown): PracticeSession[] {
   if (!Array.isArray(value)) fail("練習備份必須是場次陣列");
@@ -192,7 +280,7 @@ export function parseSessions(value: unknown): PracticeSession[] {
     }
     let previousTimestamp = session.startedAt;
     let previousElapsed = 0;
-    const inventory = { red: 0, blue: 0 };
+    let onCourt: ThrowEvent[] = [];
     for (const rawEvent of item.events) {
       const entry = object(rawEvent);
       identifier(entry.id);
@@ -210,16 +298,21 @@ export function parseSessions(value: unknown): PracticeSession[] {
         choice(entry.color, COLORS, "球色");
         choice(entry.distance, DISTANCES, "距離");
         choice(entry.direction, DIRECTIONS, "方位");
-        session.events.push({ ...base, type: "throw", color: entry.color, distance: entry.distance, direction: entry.direction });
-        inventory[entry.color]++;
+        const event: ThrowEvent = { ...base, type: "throw", color: entry.color, distance: entry.distance, direction: entry.direction };
+        session.events.push(event);
+        onCourt.push(event);
       } else if (entry.type === "pickup") {
         integer(entry.red, "紅球數量");
         integer(entry.blue, "藍球數量");
-        validatePickup({ red: entry.red, blue: entry.blue });
-        if (entry.red > inventory.red || entry.blue > inventory.blue) fail("撿球紀錄超過當時場上球數");
-        session.events.push({ ...base, type: "pickup", red: entry.red, blue: entry.blue });
-        inventory.red -= entry.red;
-        inventory.blue -= entry.blue;
+        const input: PickupInput = { red: entry.red, blue: entry.blue,
+          ...(entry.throwIds === undefined ? {} : { throwIds: entry.throwIds as string[] }),
+        };
+        const resolved = resolvePickup(onCourt, input);
+        const pickedIds = new Set(resolved.throws.map(event => event.id));
+        session.events.push({ ...base, type: "pickup", red: input.red, blue: input.blue,
+          ...(input.throwIds === undefined ? {} : { throwIds: [...input.throwIds] }),
+        });
+        onCourt = onCourt.filter(event => !pickedIds.has(event.id));
       } else fail("不支援的事件種類");
       previousTimestamp = entry.timestamp;
       previousElapsed = entry.elapsedMs;

@@ -1,0 +1,22 @@
+.direction-chart{margin:0;min-width:0;color:var(--text-muted)}
+.direction-chart-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;line-height:1.5}
+.direction-chart-stage{position:relative;padding-inline:28px}
+.direction-chart-svg{display:block;width:100%;max-width:360px;height:auto;margin:0 auto;overflow:visible}
+.direction-chart-background{fill:var(--surface-inset)}
+.direction-chart-sector{fill:var(--surface-3);stroke:var(--text-subtle);stroke-width:1}
+.direction-chart-sector.is-highest{fill:var(--accent);stroke:var(--accent)}
+.direction-chart-ring{fill:none;stroke:var(--border-strong);stroke-width:1;stroke-dasharray:3 4}
+.direction-chart-ring.is-outer{stroke-dasharray:none}
+.direction-chart-boundary{stroke:var(--border);stroke-width:1}
+.direction-chart-jack{fill:var(--text)}
+.direction-chart-label{fill:var(--text-muted);font-family:var(--font-sans);font-size:17px}
+.direction-chart-label.is-highest{fill:var(--text)}
+.direction-chart-count{font-family:var(--font-mono);font-size:20px;font-weight:500}
+.direction-chart-empty{fill:var(--text-muted);font-family:var(--font-sans);font-size:14px}
+.direction-chart-axis{position:absolute;left:0;top:50%;transform:translateY(-50%);width:28px;display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+.direction-chart-axis span{font-size:9px;line-height:1.25;white-space:nowrap}
+.direction-chart-axis svg{width:15px;height:54px;fill:none;stroke:var(--text-muted);stroke-width:1.6}
+.direction-chart-axis small{font-size:9px;white-space:nowrap;margin:0 0 5px}
+.direction-chart figcaption{text-align:center;font-size:10px;line-height:1.7;margin:0;color:var(--text-muted)}
+.direction-chart figcaption span{display:block;font-size:9px;color:var(--text-subtle)}
+@media(max-width:400px){.direction-chart-stage{padding-inline:24px}.direction-chart-axis{width:24px}.direction-chart-axis span,.direction-chart-axis small{font-size:8px}.direction-chart-meta{font-size:9px}}

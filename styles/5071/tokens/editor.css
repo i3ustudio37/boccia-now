@@ -1,0 +1,55 @@
+/* ============================================================
+   5071 — VIDEO EDITOR TOKENS
+   Timeline chrome for the editing product. Track hues are MUTED
+   (a weak hue per track class) so crimson stays exclusive to the
+   playhead and the primary action.
+   ============================================================ */
+
+:root {
+  /* ---- Track hues (weak, desaturated) ---- */
+  --track-video:      #3A3A38;
+  --track-video-edge: #55554F;
+  --track-audio:      #24443F;
+  --track-audio-edge: #3C6A62;
+  --track-text:       #46402F;
+  --track-text-edge:  #6E644A;
+  --track-sticker:    #3A3346;
+  --track-sticker-edge: #5C5170;
+  --track-effect:     #402F31;
+  --track-effect-edge: #6B4C50;
+
+  /* ---- Timeline chrome ---- */
+  --timeline-bg:      #121211;
+  --timeline-ruler:   rgba(255,255,255,0.28);
+  --timeline-ruler-minor: rgba(255,255,255,0.12);
+  --playhead:         var(--crimson-500);
+  --clip-selected:    var(--crimson-500);
+  --clip-radius:      6px;
+
+  /* ---- Timeline metrics ---- */
+  --track-h-video:  56px; /* @kind spacing */
+  --track-h-audio:  32px; /* @kind spacing */
+  --track-h-text:   26px; /* @kind spacing */
+  --ruler-h:        22px; /* @kind spacing */
+  --timeline-gap:   4px;  /* @kind spacing */
+
+  /* ---- Highlight marking (long-form → highlights flow) ---- */
+  --marker:      var(--crimson-400);
+  --marker-soft: rgba(232,70,122,0.22);
+}
+
+[data-theme="light"] {
+  --timeline-bg:    var(--n-100);
+  --timeline-ruler: rgba(26,26,25,0.35);
+  --timeline-ruler-minor: rgba(26,26,25,0.14);
+  --track-video:      #D6D6D3;
+  --track-video-edge: #B4B4B0;
+  --track-audio:      #C3DAD6;
+  --track-audio-edge: #92B7B1;
+  --track-text:       #E2DBC6;
+  --track-text-edge:  #BEB496;
+  --track-sticker:    #DAD3E4;
+  --track-sticker-edge: #B2A7C4;
+  --track-effect:     #E6D2D4;
+  --track-effect-edge: #C2A3A7;
+}

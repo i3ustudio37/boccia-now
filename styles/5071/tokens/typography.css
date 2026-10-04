@@ -1,0 +1,74 @@
+/* ============================================================
+   5071 — TYPOGRAPHY TOKENS
+   Display  : Saira Condensed  — athletic headlines, big numbers
+   Sans/UI  : Saira            — body, controls, labels
+   Mono     : JetBrains Mono   — data readouts, metric units, tags
+   ============================================================ */
+
+:root {
+  --font-display: 'Saira Condensed', 'Saira SemiCondensed', system-ui, sans-serif;
+  --font-sans:    'Saira', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Weights */
+  --fw-regular:  400; /* @kind font */
+  --fw-medium:   500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-bold:     700; /* @kind font */
+  --fw-extra:    800; /* @kind font */
+
+  /* Fluid-ish type scale (rem). Display sizes lean large + tight. */
+  --fs-3xs: 0.6875rem; /* 11 */
+  --fs-2xs: 0.75rem;   /* 12 */
+  --fs-xs:  0.8125rem; /* 13 */
+  --fs-sm:  0.875rem;  /* 14 */
+  --fs-md:  1rem;      /* 16 */
+  --fs-lg:  1.125rem;  /* 18 */
+  --fs-xl:  1.375rem;  /* 22 */
+  --fs-2xl: 1.75rem;   /* 28 */
+  --fs-3xl: 2.25rem;   /* 36 */
+  --fs-4xl: 3rem;      /* 48 */
+  --fs-5xl: 4rem;      /* 64 */
+  --fs-6xl: 5.5rem;    /* 88 */
+
+  /* Line heights */
+  --lh-tight:   1.02; /* @kind other */
+  --lh-snug:    1.15; /* @kind other */
+  --lh-normal:  1.4; /* @kind other */
+  --lh-relaxed: 1.6; /* @kind other */
+
+  /* Letter spacing — display is tight; labels/mono are wide */
+  --ls-tightest: -0.03em; /* @kind other */
+  --ls-tight:    -0.015em; /* @kind other */
+  --ls-normal:   0; /* @kind other */
+  --ls-wide:     0.04em; /* @kind other */
+  --ls-wider:    0.08em; /* @kind other */
+  --ls-widest:   0.14em; /* @kind other */
+
+  /* Semantic roles */
+  --text-display: var(--fw-bold) var(--fs-5xl)/var(--lh-tight) var(--font-display);
+  --text-h1:      var(--fw-bold) var(--fs-3xl)/var(--lh-snug) var(--font-display);
+  --text-h2:      var(--fw-semibold) var(--fs-2xl)/var(--lh-snug) var(--font-sans);
+  --text-h3:      var(--fw-semibold) var(--fs-xl)/var(--lh-snug) var(--font-sans);
+  --text-body:    var(--fw-regular) var(--fs-md)/var(--lh-relaxed) var(--font-sans);
+  --text-label:   var(--fw-semibold) var(--fs-sm)/var(--lh-normal) var(--font-sans);
+}
+
+/* Utility helpers (optional, tokens are the source of truth) */
+.eyebrow {
+  font: var(--fw-bold) var(--fs-2xs)/1 var(--font-mono);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.metric {
+  font: var(--fw-bold) var(--fs-4xl)/1 var(--font-display);
+  letter-spacing: var(--ls-tight);
+  font-variant-numeric: tabular-nums;
+}
+.metric-unit {
+  font: var(--fw-medium) var(--fs-2xs)/1 var(--font-mono);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b161b">
-<meta name="description" content="5071 BC3 AIM LAB — 六個投擲區的軌道幾何瞄準，無捲動的單頁工作台。">
-<title>BC3 AIM LAB | 單頁瞄準工作台</title>
+<meta name="description" content="BC3 六投擲區軌道瞄準模擬器，單頁無捲動。">
+<title>BC3 AIM LAB | 軌道瞄準工作台</title>
 <link rel="stylesheet" href="./studio.css">
 <script defer src="./studio.js"></script>
 </head>
@@ -13,77 +13,67 @@
 <div class="app">
 <header class="topbar">
   <div class="identity"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><div><strong>5071 <em>/</em> BC3 AIM LAB</strong><small>BOCCIA RAMP ALIGNMENT</small></div></div>
-  <div class="top-actions"><span class="version">SIX-BOX COCKPIT · V3.0</span><button id="settingsBtn" class="tool" type="button" aria-haspopup="dialog" aria-controls="settingsDialog">⚙ 進階與比較</button></div>
+  <button id="settingsBtn" class="tool" type="button" aria-haspopup="dialog" aria-controls="settingsDialog">⚙ 進階設定</button>
 </header>
 <main class="workspace">
-<section class="panel court-pane" aria-label="完整地板滾球場地">
-  <div class="court-head"><div><h1>完整球場</h1><small>6.00 × 12.50 m　·　六個投擲區</small></div><span class="court-hint">拖曳白球或旋轉中心</span></div>
-  <div class="court-stage">
-    <svg id="court" viewBox="0 0 570 1020" preserveAspectRatio="xMidYMid meet" role="img" aria-label="完整地板滾球場地俯視圖，包含六個投擲區、V字線、十字標記、白球與瞄準線。"></svg>
-  </div>
-  <div class="court-foot"><span><strong>●</strong> 白球（黃）　 <strong>●</strong> 旋轉中心（藍）</span><span>點擊投擲區切換</span></div>
-</section>
-<section class="right-pane" aria-label="瞄準控制與結果">
-  <section class="panel box-pane" aria-label="選擇投擲區">
-    <div class="box-heading"><strong>投擲區 1–6</strong><small>面向球場 · 左至右</small></div>
-    <div id="boxButtons" class="box-buttons" role="group" aria-label="投擲區切換按鈕"></div>
+  <section class="panel court-pane" aria-label="完整地板滾球場地">
+    <div class="court-head"><div><h1>完整球場</h1><small>6.00 × 12.50 m ｜ 六個投擲區</small></div></div>
+    <div class="court-stage">
+      <svg id="court" viewBox="42 0 486 1020" preserveAspectRatio="xMidYMid meet" role="img" aria-label="完整地板滾球場地俯視圖，含六個投擲區、V字線、十字標記、白球及瞄準線。"></svg>
+    </div>
+    <div class="court-foot"><span><strong>●</strong> 黃色＝白球　<strong>●</strong> 藍色＝旋轉中心</span><span>可拖曳定位</span></div>
   </section>
-  <div class="data-grid">
-    <section class="panel form-pane" aria-label="可直接調整的幾何座標">
-      <div class="form-block">
-        <div class="section-head"><i class="pip yellow"></i><h2>白球位置</h2><small>全場座標</small></div>
-        <div class="field-pair">
-          <label class="field" for="jackForward"><span>前方 Y</span><small>投擲線起算：0～10</small><div class="input-wrap"><input id="jackForward" name="jackForward" type="number" inputmode="decimal" min="0" max="10" step=".05" value="6.00"><i>m</i></div></label>
-          <label class="field" for="jackX"><span>左右 X</span><small>左 − ／右 ＋，−3～+3</small><div class="input-wrap"><input id="jackX" name="jackX" type="number" inputmode="decimal" min="-3" max="3" step=".05" value="0.00"><i>m</i></div></label>
-        </div>
-        <p class="legend-line">例如：前方 6.0、左側 1.5 → Y = 6.0、X = −1.5。</p>
-      </div>
-      <div class="form-block">
-        <div class="section-head"><i class="pip blue"></i><h3>軌道旋轉中心</h3><small>所選投擲區</small></div>
-        <div class="field-pair">
-          <label class="field" for="pivotX"><span>左右偏移 X</span><small>區中心：−0.5～+0.5</small><div class="input-wrap"><input id="pivotX" name="pivotX" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0.00"><i>m</i></div></label>
-          <label class="field" for="pivotBack"><span>向後距離</span><small>投擲線起算：0～2.5</small><div class="input-wrap"><input id="pivotBack" name="pivotBack" type="number" inputmode="decimal" min="0" max="2.5" step=".05" value="1.25"><i>m</i></div></label>
-        </div>
-        <p class="legend-line">每個投擲區的旋轉中心位置獨立保留至重整頁面。</p>
-      </div>
-      <div class="form-block">
-        <div class="section-head"><i class="pip green"></i><h3>目前軌道方向</h3><small>角度輸入</small></div>
-        <label class="field" for="currentAngle"><span>目前角度 θ₀</span><small>正前方為 0°，右轉正，左轉負</small><div class="input-wrap"><input id="currentAngle" name="currentAngle" type="number" inputmode="decimal" step=".1" value="0.00"><i>°</i></div></label>
-      </div>
-      <div class="value-tip">更改任一數值，右側計算結果和左側瞄準線會立即更新，不必按「計算」。</div>
+  <aside class="right-pane" aria-label="座標輸入與瞄準計算">
+    <section class="panel selected-pane">
+      <label for="boxSelect">投擲區</label>
+      <select id="boxSelect" aria-label="選擇投擲區">
+        <option value="1">第 1 投擲區</option>
+        <option value="2">第 2 投擲區</option>
+        <option value="3" selected>第 3 投擲區</option>
+        <option value="4">第 4 投擲區</option>
+        <option value="5">第 5 投擲區</option>
+        <option value="6">第 6 投擲區</option>
+      </select>
     </section>
-    <section class="panel result-pane" aria-label="瞄準結果">
-      <div class="result-head">即時瞄準結果 <small id="boxReadout">第 3 投擲區</small></div>
+    <section class="panel coordinates-pane" aria-label="座標數值輸入">
+      <div class="group-label"><i class="pip yellow"></i><strong>白球位置</strong><small>全場座標</small></div>
+      <label for="jackForward" class="coordinate-row"><span>白球・前後距離 <small>前方為正，0～10 m</small></span><div class="input-wrap"><input id="jackForward" name="jackForward" type="number" inputmode="decimal" min="0" max="10" step=".05" value="6.00"><i>m</i></div></label>
+      <label for="jackX" class="coordinate-row"><span>白球・左右距離 <small>左 − ／右 ＋，±3 m</small></span><div class="input-wrap"><input id="jackX" name="jackX" type="number" inputmode="decimal" min="-3" max="3" step=".05" value="0.00"><i>m</i></div></label>
+      <div class="group-label base-group"><i class="pip blue"></i><strong>底座中心</strong><small>相對所選區域</small></div>
+      <label for="pivotX" class="coordinate-row"><span>底座・左右位置 <small>左 − ／右 ＋，±0.5 m</small></span><div class="input-wrap"><input id="pivotX" name="pivotX" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0.00"><i>m</i></div></label>
+      <label for="pivotBack" class="coordinate-row"><span>底座・前後位置 <small>由投擲線向後 0～2.5 m</small></span><div class="input-wrap"><input id="pivotBack" name="pivotBack" type="number" inputmode="decimal" min="0" max="2.5" step=".05" value="1.25"><i>m</i></div></label>
+    </section>
+    <section class="panel results-pane" aria-label="即時瞄準結果">
+      <div class="result-head">瞄準結果 <small id="boxReadout">第 3 投擲區</small></div>
       <div class="main-result"><div class="eyebrow">相對正前方瞄準角度</div><div class="degrees" id="aimAngle" aria-live="polite">—</div><div id="aimDir" class="result-direction">計算中…</div></div>
-      <div class="secondary-result"><span>從目前方向還需旋轉</span><strong id="rotateBy">—</strong><small id="rotateDir">—</small></div>
-      <div class="compact-stats">
-        <div class="stat-chip"><small>至白球距離</small><strong id="distance">—</strong></div>
-        <div class="stat-chip"><small>白球 X, Y</small><strong id="globalJack">—</strong></div>
-        <div class="stat-chip"><small>中心 X, Y</small><strong id="globalPivot">—</strong></div>
-      </div>
+      <div class="secondary-result"><span>相對目前方向旋轉</span><strong id="rotateBy">—</strong><small id="rotateDir">—</small></div>
+      <div class="small-results"><div><small>直線距離</small><strong id="distance">—</strong></div><div><small>白球 X, Y</small><strong id="globalJack">—</strong></div><div><small>底座 X, Y</small><strong id="globalPivot">—</strong></div></div>
       <div id="inputError" class="error" role="alert" hidden></div>
       <div id="jackState" class="jack-state" role="status" hidden></div>
-      <button id="compareBtn" type="button" class="advanced-link">查看六區比較與顯示設定　↗</button>
+      <button id="compareBtn" type="button" class="advanced-link">六區比較與進階設定　↗</button>
     </section>
-  </div>
-</section>
+  </aside>
 </main>
 </div>
 <dialog id="settingsDialog" aria-label="六區比較與進階設定">
   <div class="modal-inner">
-    <div class="modal-head"><div><h2>六區比較與進階設定</h2><p>可切換投擲區，亦可自訂場地參考線顯示方式。</p></div><button id="modalClose" type="button" class="close" aria-label="關閉選單">×</button></div>
-    <div class="advanced-section"><h3>同一白球座標 · 六區角度</h3><div class="comparison" id="compareGrid"></div></div>
-    <div class="advanced-section"><h3>俯視圖顯示設定</h3>
+    <div class="modal-head"><div><h2>進階設定</h2><p>設定目前軌道方向、查看六區角度比較與場地顯示選項。</p></div><button id="modalClose" type="button" class="close" aria-label="關閉">×</button></div>
+    <div class="advanced-section">
+      <h3>目前軌道角度（所選投擲區）</h3>
+      <label class="advanced-input" for="currentAngle">目前角度 θ₀ <small>正前方 0°，向右為正，向左為負</small><div class="input-wrap"><input id="currentAngle" name="currentAngle" type="number" inputmode="decimal" step=".1" value="0.00"><i>°</i></div></label>
+    </div>
+    <div class="advanced-section"><h3>相同白球位置：六區角度比較</h3><div class="comparison" id="compareGrid"></div></div>
+    <div class="advanced-section"><h3>場地顯示</h3>
       <label class="setting-row" for="showGrid">顯示球場公尺網格 <input id="showGrid" type="checkbox" checked></label>
       <label class="setting-row" for="showV">顯示 V 字線與白球無效區 <input id="showV" type="checkbox" checked></label>
       <label class="setting-row" for="showHeading">顯示目前軌道方向參考線 <input id="showHeading" type="checkbox" checked></label>
     </div>
-    <div class="advanced-section"><h3>座標與角度定義</h3>
-      <p class="reference">白球使用<strong>全場共同座標</strong>：六個投擲區前緣中央是原點；前方 Y 為 0～10 m，左側 X 為負、右側 X 為正，範圍 ±3 m。</p>
-      <p class="reference">旋轉中心使用<strong>目前投擲區的相對座標</strong>：左右偏移 ±0.5 m，從投擲線向後 0～2.5 m。</p>
-      <p class="reference">公式：θ = atan2（白球全場 X − 中心全場 X，白球前方 Y ＋ 中心後退距離）；旋轉量為 θ 減去目前方向，並正規化至最短角度。</p>
-      <p class="reference">此版只驗證軌道中心線的幾何指向，不預測實際落球位置，也未校正底座與出球點的偏移。</p>
-      <button id="resetBtn" class="tool modal-reset" type="button">↺　重設白球與六區的所有參數</button>
+    <div class="advanced-section">
+      <h3>座標定義</h3>
+      <p class="reference">白球使用整個球場的共同座標：投擲線中央為原點，向前 Y 為正、向右 X 為正。</p>
+      <p class="reference">底座左右位置為相對目前投擲區中心的偏移；底座前後位置為自投擲線往後的距離（正數）。</p>
+      <p class="reference">僅計算中心線幾何角度，不推算實際投球落點，也不保證賽場輔具符合規則。</p>
+      <button id="resetBtn" class="tool modal-reset" type="button">↺ 重設白球與六區參數</button>
     </div>
   </div>
 </dialog>

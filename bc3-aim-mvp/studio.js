@@ -63,21 +63,8 @@
     readPivotInput();
     state.selected=box;
     setPivotInputs();
+    $("boxSelect").value=String(box);
     render();
-  }
-  function initBoxes(){
-    const root=$("boxButtons");
-    root.replaceChildren();
-    for(let box=1;box<=6;box++){
-      const b=document.createElement("button");
-      b.type="button";b.className="box-button";
-      b.dataset.box=String(box);
-      const small=document.createElement("small");small.textContent="投擲區";
-      const num=document.createElement("span");num.textContent=String(box);
-      b.append(num,small);
-      b.addEventListener("click",()=>selectBox(box));
-      root.append(b);
-    }
   }
   function displayResults(a){
     $("boxReadout").textContent="第 "+state.selected+" 投擲區";
@@ -97,8 +84,7 @@
       status.className="jack-state"+(invalid?" warn":"");
       status.textContent=invalid?"白球中心位於 V 字線或後方的無效區（僅作幾何提醒）。":"白球中心在 V 字線前方（未計球體半徑及標線寬度）。";
     } else status.hidden=true;
-    const buttons=$("boxButtons").children;
-    for(let i=0;i<buttons.length;i++)buttons[i].setAttribute("aria-pressed",String(i+1===state.selected));
+    $("boxSelect").value=String(state.selected);
   }
   function renderComparison(){
     const root=$("compareGrid");root.replaceChildren();
@@ -229,5 +215,6 @@
     $("jackForward").value="6.00";$("jackX").value="0.00";
     setPivotInputs();render();dialog.close();
   });
-  initBoxes();setPivotInputs();render();
+  $("boxSelect").addEventListener("change",event=>selectBox(Number(event.target.value)));
+  setPivotInputs();render();
 })();

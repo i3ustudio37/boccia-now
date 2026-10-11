@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e171b">
-<title>BC3 AIM LAB｜軌道瞄準模擬器</title>
+<title>BC3 AIM LAB｜六投擲區全場瞄準模擬器</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;background:#0e171b;color:#e6f1eb}
 *{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}
@@ -41,28 +41,62 @@ button:hover{background:#2a4842}
 .disclaimer{border:1px solid #40524a;background:#192a29;padding:17px 20px;margin-top:18px;border-radius:12px;color:#bdd1c9;font-size:13px}
 footer{display:flex;gap:14px;justify-content:space-between;padding:25px 0 5px;color:#6d8988;font-size:11px}
 @media(max-width:760px){.shell{padding:14px}.hero{padding:24px 2px}.workspace{grid-template-columns:1fr}.panel{padding:16px}.readout{gap:8px}.readout>div{padding:12px}footer{flex-direction:column}}
+
+/* Six-box court v2 */
+:root{--green:#c4f37d;--blue:#70bee8;--yellow:#f4d476}
+.hero{padding:31px 0 25px}.hero p{max-width:740px}
+.zone-picker{border:1px solid #365148;background:#16292a;border-radius:14px;padding:17px 19px;margin-bottom:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.zone-info{min-width:172px}.zone-info b{font-size:16px}.zone-info p{font-size:11px;margin-top:4px}.zone-buttons{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;flex:1;min-width:240px}
+.zone-button{background:#0c1c22;color:#c3d6d5;border-color:#3b5554;border-radius:10px;padding:13px 6px;font-size:13px}
+.zone-button strong{display:block;font-size:20px;margin-top:4px}.zone-button small{display:block;font-size:10px}
+.zone-button[aria-pressed="true"]{background:#bfdc7c;color:#11201d;border-color:#c8fa85;box-shadow:0 0 0 2px #b9ea7f2c}
+.zone-button[aria-pressed="true"] small{color:#314b36}
+.zone-footnote{width:100%;font-size:11px;color:#91adaa}
+#court{touch-action:none;user-select:none;aspect-ratio:700/1110}
+.court-instruction{font-size:11px;color:#9db6b0;margin:10px 0 0}
+.court-instruction strong{color:#c4f37d}
+.fullcourt-label{font-size:12px;color:#b0e1c2}
+.summary-coords{display:flex;justify-content:space-between;gap:10px;color:#9abbb8;font-size:11px;margin:12px 0 0;flex-wrap:wrap}
+.summary-coords strong{color:#e0eddf}
+.compare-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:21px 0 11px;border-top:1px solid #355052;margin-top:17px}
+.compare-title h3{font-size:15px;margin:0;color:#e2f0ec}.compare-title small{font-size:10px}
+.compare-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.compare-item{background:#112328;border:1px solid #355055;border-radius:10px;padding:10px;min-width:0;text-align:left}
+.compare-item[aria-current="true"]{background:#294232;border-color:#bce57a}
+.compare-item em{display:block;font-style:normal;font-size:10px;color:#94b2b2}
+.compare-item strong{display:block;font-size:19px;margin:7px 0 3px;font-variant-numeric:tabular-nums}
+.compare-item small{font-size:10px}
+.compare-item[aria-current="true"] strong{color:#c4f37d}
+.validation-notice{font-size:11px;line-height:1.6;color:#dcc987;background:#3a3321;border:1px solid #796846;border-radius:9px;padding:11px;margin:11px 0 0}
+.validation-notice.ok{color:#a6c7b2;background:#1b2d26;border-color:#355246}
+.validation-notice[hidden]{display:none}
+.error[hidden]{display:none}
+.disclaimer{line-height:1.7}
+@media(max-width:800px){.zone-picker{gap:12px}.zone-info{min-width:100%;}.zone-buttons{min-width:100%}.compare-item strong{font-size:17px}}
+@media(max-width:470px){.zone-picker{padding:12px}.zone-buttons{gap:5px}.zone-button{padding:10px 0;font-size:10px}.zone-button strong{font-size:17px}.zone-button small{font-size:9px}.compare-grid{gap:5px}.compare-item{padding:9px 7px}.compare-item strong{font-size:14px}.shell{padding:0 12px 22px}}
+
 </style>
 </head>
 <body>
 <div class="shell">
-<nav><div class="logo">5071 <i>/</i> BC3 AIM LAB</div><span class="tag">GEOMETRY MVP · v1.0</span></nav>
-<header class="hero"><div class="eyebrow">BOCCIA / RAMP ALIGNMENT</div><h1>讓每一次瞄準，<br><em>都有跡可循。</em></h1><p>已知白球座標與軌道旋轉中心位置，計算相對正前方的瞄準角度，以及從目前方向應旋轉多少度。</p></header>
-<main class="workspace">
+<nav><div class="logo">5071 <i>/</i> BC3 AIM LAB</div><span class="tag">FULL COURT · v2.0</span></nav>
+<header class="hero"><div class="eyebrow">BOCCIA / RAMP ALIGNMENT</div><h1>六個投擲區，<br><em>同一條瞄準線。</em></h1><p>輸入白球的球場座標，切換六個投擲區，計算不同旋轉中心的瞄準角度及所需旋轉量。</p></header>
+<section class="zone-picker" aria-label="選擇投擲區"><div class="zone-info"><b>選擇投擲區</b><p>從選手視角：左 1 → 右 6</p></div><div class="zone-buttons" id="zones" role="group" aria-label="六個投擲區"></div><div class="zone-footnote">選擇後會使用該投擲區獨立的旋轉中心與目前角度設定；白球全場座標保持不變。</div></section><main class="workspace">
 <section class="panel">
-<h2>01　座標設定</h2><p>距離單位：公尺（m）</p>
+<h2>01　座標設定 <span id="selectedBox" class="pill">3 號</span></h2><p>距離單位：公尺（m）</p>
 <h3>🟡 白球位置 <span class="pill">TARGET</span></h3>
 <div class="field-grid">
-<label><span>前方距離 <small>由投擲區前緣起算</small></span><input id="forward" type="number" inputmode="decimal" min="0" step=".1" value="5"></label>
+<label><span>前方距離 <small>由六區共同投擲線起算</small></span><input id="forward" type="number" inputmode="decimal" min="0" max="10" step=".1" value="6"></label>
 <label><span>左右方向</span><select id="side"><option value="0">正中央</option><option value="1">右側</option><option value="-1">左側</option></select></label>
 </div>
-<label><span>左右距離 <small>由投擲區中線起算</small></span><input id="offset" type="number" inputmode="decimal" min="0" step=".1" value="0"></label>
+<label><span>左右距離 <small>由整個球場中線起算（±3 m）</small></span><input id="offset" type="number" inputmode="decimal" min="0" max="3" step=".1" value="0"></label>
 <hr class="sectionline">
 <h3>🔵 軌道旋轉中心 <span class="pill">PIVOT</span></h3>
 <div class="field-grid">
-<label><span>左右位置 <small>左負 / 右正</small></span><input id="px" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0"></label>
+<label><span>左右位置 <small>相對所選投擲區中心，左負 / 右正</small></span><input id="px" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0"></label>
 <label><span>向後距離 <small>由投擲區前緣起算</small></span><input id="back" type="number" inputmode="decimal" min="0" max="2.5" step=".05" value="1.25"></label>
 </div>
-<p class="hint">旋轉中心可在 1.00 m × 2.50 m 範圍內移動，或直接拖曳右側圖中的藍點。</p>
+<p class="hint">每區寬 1 m、深 2.5 m；此位置相對目前選取的投擲區中心計算，亦可拖曳圖中的藍點。</p>
 <hr class="sectionline">
 <h3>目前軌道方向 <span class="pill">OPTIONAL</span></h3>
 <label><span>目前角度 <small>正前方 0°；右轉＋、左轉−</small></span><input id="now" type="number" inputmode="decimal" value="0" step=".1"></label>
@@ -70,92 +104,250 @@ footer{display:flex;gap:14px;justify-content:space-between;padding:25px 0 5px;co
 <button id="reset" type="button">↺ 重設示範座標</button>
 </section>
 <section class="panel">
-<div class="toolbar"><div><h2>02　瞄準俯視圖</h2><small>拖曳藍色旋轉中心可即時重算</small></div><div class="legend"><span><i class="dot" style="background:#f4d476"></i>白球</span><span><i class="dot" style="background:#72c4ee"></i>旋轉中心</span></div></div>
-<svg id="court" viewBox="0 0 700 560" aria-label="白球、投擲區、旋轉中心與瞄準線俯視圖" role="img"></svg>
-<div id="error" class="error" role="alert" hidden></div>
+<div class="toolbar"><div><h2>02　全場瞄準俯視圖</h2><small>完整場地 6.00 × 12.50 m</small></div><div class="legend"><span><i class="dot" style="background:#f4d476"></i>白球</span><span><i class="dot" style="background:#72c4ee"></i>旋轉中心</span></div></div>
+<svg id="court" viewBox="0 0 700 1110" aria-label="完整地板滾球場地，包括六個投擲區、V 字線、中央十字、白球與瞄準線" role="img"></svg>
+<p class="court-instruction">操作：<strong>選取六區、拖曳白球或藍色旋轉中心</strong>，即可重新計算。</p><div id="error" class="error" role="alert" hidden></div><div class="validation-notice" id="jackStatus" role="status" hidden></div><div class="summary-coords"><span>目前投擲區：<strong id="selectedBoxContext">第 3 號投擲區</strong></span><span>白球全場座標：<strong id="jackGlobal">—</strong></span><span>旋轉中心全場座標：<strong id="pivotGlobal">—</strong></span></div>
 <div class="readout" aria-live="polite">
 <div class="primary"><small>所需瞄準角度 · 正前方 0°</small><span class="angle" id="angle">0.00°</span><span class="direction" id="sideText">正前方</span></div>
 <div><small>相對目前方向旋轉</small><span class="value" id="delta">0.00°</span><span class="direction" id="deltaText">不需旋轉</span></div>
 <div><small>中心至白球直線距離</small><span class="value" id="distance">6.25 m</span><span class="direction">幾何直線距離</span></div>
 </div>
-<p class="hint">θ = atan2（白球左右座標 − 中心左右座標，白球前方距離 ＋ 中心向後距離）</p>
+<p class="hint">θ = atan2（白球全場 X − 旋轉中心全場 X，白球前方 Y ＋ 旋轉中心向後距離）</p><div class="compare-title"><h3>六區角度比較</h3><small>點選任一區可切換</small></div><div class="compare-grid" id="zoneComparison" aria-label="六個投擲區瞄準角度比較"></div>
 </section>
 </main>
 <div class="disclaimer"><strong>幾何瞄準 ≠ 實際投球落點。</strong> 本 MVP 尚未納入軌道尺寸、旋轉限制、球速、坡度、摩擦、碰撞與競賽器材規範，僅供訓練研究與概念驗證。</div>
-<footer><span>5071 STUDIO / BC3 AIM LAB</span><span>投擲區：寬 1.00 m、深 2.50 m</span></footer>
+<footer><span>5071 STUDIO / BC3 AIM LAB</span><span>球場：6.00 × 12.50 m｜每區：1.00 × 2.50 m</span></footer>
 </div>
 <script>
-(function(){
-'use strict';
-var $=id=>document.getElementById(id);
-var ids=['forward','side','offset','px','back','now'];
-var svg=$('court'),ns='http://www.w3.org/2000/svg',map,dragging=false;
-function node(name,attrs,text){var e=document.createElementNS(ns,name);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,String(v)));if(text!=null)e.textContent=text;svg.append(e);return e;}
-function label(x,y,s,color,anchor){node('text',{x:x,y:y,fill:color||'#9db6b1','font-size':12,'font-family':'system-ui,sans-serif','text-anchor':anchor||'middle'},s);}
-function validNum(id){var v=$(id).value.trim();return v!==''&&Number.isFinite(Number(v))?Number(v):NaN;}
-function wrap(a){return ((a+180)%360+360)%360-180;}
-function calc(){
- var f=validNum('forward'),o=validNum('offset'),side=validNum('side'),px=validNum('px'),b=validNum('back'),now=validNum('now');
- var error='';
- if([f,o,side,px,b,now].some(v=>!Number.isFinite(v)))error='請填入有效數值。';
- else if(f<0||o<0)error='白球前方距離與左右距離不可為負數。';
- else if(o>0&&side===0)error='左右距離大於零時，請選擇白球位於左側或右側。';
- else if(px<-.5||px>.5||b<0||b>2.5)error='旋轉中心須在左右 ±0.50 m、向後 0～2.50 m 範圍內。';
- var tx=o*side,dx=tx-px,dy=f+b,d=Math.hypot(dx,dy);
- if(!error&&d<1e-9)error='白球與旋轉中心重合，無法定義瞄準方向。';
- var angle=!error?Math.atan2(dx,dy)*180/Math.PI:NaN,delta=!error?wrap(angle-now):NaN;
- return {f:f,o:o,tx:tx,px:px,b:b,now:now,angle:angle,delta:delta,d:d,error:error};
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const svg = $("court");
+const ns = "http://www.w3.org/2000/svg";
+const state = {
+  box: 3,
+  settings: Array.from({length:6}, () => ({px:"0",back:"1.25",now:"0"})),
+  drag: null
+};
+const WORLD = {width:6,length:12.5,boxDepth:2.5,playLength:10};
+const X = x => 350 + x*76;
+const Y = y => 1025 - (y+2.5)*74;
+const invX = px => (px-350)/76;
+const invY = py => (1025-py)/74-2.5;
+const numeric = id => {
+  const e=$(id); const t=e.value.trim();
+  return t===""?NaN:Number(t);
+};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const wrap180=v=>((v+180)%360+360)%360-180;
+const round2=v=>Math.round(v*100)/100;
+const degrees=v=>(v>=0?"+":"")+v.toFixed(2)+"°";
+const center=box=>box-3.5;
+const addSvg=(tag,props,text)=>{
+  const n=document.createElementNS(ns,tag);
+  for(const [key,value] of Object.entries(props||{}))n.setAttribute(key,String(value));
+  if(text!==undefined)n.textContent=text;
+  svg.append(n);
+  return n;
+};
+const txt=(x,y,s,props={})=>addSvg("text",{x,y,fill:"#95b7b8","text-anchor":"middle","font-size":12,"font-family":"system-ui, sans-serif",...props},s);
+const seg=(x1,y1,x2,y2,props={})=>addSvg("line",{x1,y1,x2,y2,stroke:"#466063","stroke-width":1,...props});
+function zoneButtons(){
+  const parent=$("zones");
+  parent.replaceChildren();
+  for(let i=1;i<=6;i++){
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="zone-button";
+    button.dataset.box=String(i);
+    button.setAttribute("aria-pressed",String(i===state.box));
+    button.innerHTML='<small>投擲區</small><strong>'+i+'</strong>';
+    button.addEventListener("click",()=>changeBox(i));
+    parent.append(button);
+  }
 }
-function signed(v){return (v>0?'+':'')+v.toFixed(2)+'°';}
+function rememberSettings(){
+  state.settings[state.box-1]={px:$("px").value,back:$("back").value,now:$("now").value};
+}
+function changeBox(box){
+  if(!Number.isInteger(box)||box<1||box>6)return;
+  rememberSettings();
+  state.box=box;
+  const settings=state.settings[box-1];
+  $("px").value=settings.px;
+  $("back").value=settings.back;
+  $("now").value=settings.now;
+  zoneButtons();
+  render();
+}
+function calculate(box,setting){
+  const f=numeric("forward"),offset=numeric("offset"),side=numeric("side");
+  const px=Number(setting.px),back=Number(setting.back),now=Number(setting.now);
+  let error="";
+  if (![f,offset,side,px,back,now].every(Number.isFinite) ||
+      [setting.px,setting.back,setting.now].some(v=>String(v).trim()==="")) error="請完整輸入有效數值。";
+  else if(f<0||f>10||offset<0||offset>3)error="白球座標必須在球場內：前方 0～10 m，左右 0～3 m。";
+  else if(offset>0 && side===0)error="左右距離不為 0 時，請選擇白球在左側或右側。";
+  else if(px<-.5||px>.5||back<0||back>2.5)error="旋轉中心須在投擲區範圍內：左右 ±0.50 m、向後 0～2.50 m。";
+  const jackX=side*offset;
+  const pivotX=center(box)+px;
+  const pivotY=-back;
+  const dx=jackX-pivotX;
+  const dy=f+back;
+  const d=Math.hypot(dx,dy);
+  if(!error && (dy<=0||d<1e-8))error="白球必須在軌道旋轉中心前方，且不可與旋轉中心重合。";
+  const angle=error?NaN:Math.atan2(dx,dy)*180/Math.PI;
+  const delta=error?NaN:wrap180(angle-now);
+  return {box,f,jackX,pivotX,pivotY,px,back,now,dx,dy,d,angle,delta,error};
+}
+function currentCalc(){return calculate(state.box,state.settings[state.box-1]);}
 function render(){
- var a=calc();
- $('error').hidden=!a.error;$('error').textContent=a.error;
- $('angle').textContent=a.error?'—':signed(a.angle);
- $('sideText').textContent=a.error?'請修正座標':Math.abs(a.angle)<.005?'正前方 / 不需偏轉':a.angle>0?'右轉 / 順時針':'左轉 / 逆時針';
- $('delta').textContent=a.error?'—':signed(a.delta);
- $('deltaText').textContent=a.error?'':Math.abs(a.delta)<.005?'不需旋轉':a.delta>0?'順時針右轉':'逆時針左轉';
- $('distance').textContent=a.error?'—':a.d.toFixed(2)+' m';
- draw(a);
+  rememberSettings();
+  const a=currentCalc();
+  $("selectedBox").textContent=state.box+" 號";
+  $("selectedBoxContext").textContent="第 "+state.box+" 號投擲區";
+  $("error").hidden=!a.error;
+  $("error").textContent=a.error;
+  $("angle").textContent=a.error?"—":degrees(a.angle);
+  $("sideText").textContent=a.error?"請修正座標":Math.abs(a.angle)<.005?"正前方 / 不需偏轉":a.angle>0?"右轉／順時針":"左轉／逆時針";
+  $("delta").textContent=a.error?"—":degrees(a.delta);
+  $("deltaText").textContent=a.error?"":Math.abs(a.delta)<.005?"不需旋轉":a.delta>0?"順時針向右":"逆時針向左";
+  $("distance").textContent=a.error?"—":a.d.toFixed(2)+" m";
+  const warning=$("jackStatus");
+  if(Number.isFinite(a.f)&&Number.isFinite(a.jackX) && a.f>=0&&a.f<=10 && Math.abs(a.jackX)<=3){
+    const vLine=1.5+Math.abs(a.jackX)*0.5;
+    const invalid=a.f<=vLine+1e-8;
+    warning.className="validation-notice"+(invalid?"":" ok");
+    warning.textContent=invalid?
+       "白球中心在 V 字線或其後方的無效區（簡化幾何判斷）。可計算指向角，但不能據此判定為有效白球。":
+       "白球中心在 V 字線前方；此為中心座標判斷，未包含球半徑和標線寬度。";
+    warning.hidden=false;
+  }else{warning.hidden=true;}
+  $("jackGlobal").textContent=a.error?"—":"("+a.jackX.toFixed(2)+", "+a.f.toFixed(2)+") m";
+  $("pivotGlobal").textContent=a.error?"—":"("+a.pivotX.toFixed(2)+", "+a.pivotY.toFixed(2)+") m";
+  const comparison=$("zoneComparison");
+  comparison.replaceChildren();
+  for(let box=1;box<=6;box++){
+    const candidate=calculate(box,state.settings[box-1]);
+    const b=document.createElement("button");
+    b.className="compare-item";b.type="button";
+    b.dataset.box=String(box);
+    b.setAttribute("aria-current",String(box===state.box));
+    const caption=document.createElement("em");caption.textContent="BOX "+box;
+    const heading=document.createElement("strong");heading.textContent=candidate.error?"—":degrees(candidate.angle);
+    const small=document.createElement("small");small.textContent=candidate.error?"請檢查輸入":"旋轉 "+degrees(candidate.delta);
+    b.append(caption,heading,small);
+    b.addEventListener("click",()=>changeBox(box));
+    comparison.append(b);
+  }
+  draw(a);
 }
 function draw(a){
  svg.replaceChildren();
- var f=Number.isFinite(a.f)?Math.max(0,a.f):5;
- var tx=Number.isFinite(a.tx)?a.tx:0,px=Number.isFinite(a.px)?a.px:0,b=Number.isFinite(a.b)?a.b:1.25;
- var bound=Math.max(2.2,Math.abs(tx)+1,Math.abs(px)+1),low=-2.9,high=Math.max(3.25,f+.75),left=66,right=635,top=28,bottom=516;
- var scale=Math.min((right-left)/(2*bound),(bottom-top)/(high-low));
- var X=x=>350+x*scale,Y=y=>bottom-(y-low)*scale;
- map={X:X,Y:Y,scale:scale,low:low,bottom:bottom};
- for(var i=0;i<=Math.ceil(high);i++){var yy=Y(i);node('line',{x1:left,y1:yy,x2:right,y2:yy,stroke:'#294047','stroke-dasharray':'4 8'});label(left-8,yy+4,i+' m','#718f92','end');}
- node('line',{x1:X(0),y1:Y(low),x2:X(0),y2:Y(high),stroke:'#6c8680','stroke-dasharray':'6 8'});
- node('rect',{x:X(-.5),y:Y(0),width:scale,height:2.5*scale,fill:'#234b45','fill-opacity':'.7',stroke:'#83b89f','stroke-width':2});
- node('line',{x1:X(-.5),y1:Y(0),x2:X(.5),y2:Y(0),stroke:'#c2f47c','stroke-width':3});
- label(X(0),Y(0)-10,'投擲區前緣','#d5f69d');
- label(X(0),Y(-2.5)+20,'寬 1.00 m / 深 2.50 m','#9cb7ad');
- var p={x:X(px),y:Y(-b)},t={x:X(tx),y:Y(f)};
- if(!a.error){
-  node('line',{x1:p.x,y1:p.y,x2:t.x,y2:t.y,stroke:'#c2f47c','stroke-width':3.5,'stroke-linecap':'round'});
-  var rad=a.now*Math.PI/180,ray=Math.max(35,Math.min(90,scale*1.8));
-  node('line',{x1:p.x,y1:p.y,x2:p.x+ray*Math.sin(rad),y2:p.y-ray*Math.cos(rad),stroke:'#b0c3c5','stroke-dasharray':'5 6'});
-  node('circle',{cx:t.x,cy:t.y,r:21,fill:'none',stroke:'#f4d476','stroke-opacity':'.4','stroke-dasharray':'3 4'});
-  node('circle',{cx:t.x,cy:t.y,r:11,fill:'#f4d476',stroke:'#152222','stroke-width':3});
-  label(Math.min(630,t.x+20),t.y-16,'白球','#f4d476','start');
-  var steps=Math.max(2,Math.ceil(Math.abs(a.angle)/5)),path='';
-  for(var k=0;k<=steps;k++){var ar=a.angle*Math.PI/180*k/steps;path+=(k?'L':'M')+(p.x+45*Math.sin(ar))+' '+(p.y-45*Math.cos(ar))+' ';}
-  node('path',{d:path,fill:'none',stroke:'#c2f47c','stroke-width':2});
+ const left=X(-3),right=X(3),top=Y(10),bottom=Y(-2.5),front=Y(0);
+ // Court background and metric grid.
+ addSvg("rect",{x:left,y:top,width:right-left,height:bottom-top,fill:"#153035",stroke:"#a3c0b8","stroke-width":3});
+ for(let y=0;y<=10;y++){
+   seg(left,Y(y),right,Y(y),{stroke:y===0?"#bce785":"#335357","stroke-width":y===0?3:1,"stroke-dasharray":y===0?"":"4 8"});
+   txt(left-19,Y(y)+4,y+"m",{fill:"#86a3a2","font-size":12});
  }
- node('circle',{cx:p.x,cy:p.y,r:21,fill:'#70bee8','fill-opacity':'.2',stroke:'#70bee8','stroke-opacity':'.6'});
- node('circle',{cx:p.x,cy:p.y,r:9,fill:'#70bee8',stroke:'#0b1b20','stroke-width':3});
- node('circle',{cx:p.x,cy:p.y,r:28,fill:'transparent','data-drag':'true',style:'cursor:grab'});
- label(p.x+16,p.y+35,'旋轉中心','#92d2f1','start');
- label(350,17,'↑　球場前方','#b6d4c4');
+ for(let x=-2;x<=2;x++){
+   seg(X(x),top,X(x),front,{stroke:"#29474a","stroke-dasharray":"4 10"});
+ }
+ seg(X(0),top,X(0),front,{stroke:"#55746e","stroke-dasharray":"7 10"});
+ // V line and light shading of jack-invalid region.
+ addSvg("polygon",{points:[[-3,0],[-3,3],[0,1.5],[3,3],[3,0]].map(([x,y])=>X(x)+","+Y(y)).join(" "),fill:"#a67651","fill-opacity":".12"});
+ addSvg("polyline",{points:[[-3,3],[0,1.5],[3,3]].map(([x,y])=>X(x)+","+Y(y)).join(" "),fill:"none",stroke:"#f4a77d","stroke-width":3.5,"stroke-linejoin":"round"});
+ txt(X(0),Y(.9),"白球無效區",{fill:"#b9a48e","font-size":13});
+ txt(X(0),Y(3.2),"V 字線",{fill:"#efb38a","font-size":13});
+ // Penalty target at centre of playing area, 0.35 m square with cross.
+ const boxSize=.35*76;
+ addSvg("rect",{x:X(0)-boxSize/2,y:Y(5)-boxSize/2,width:boxSize,height:boxSize,fill:"none",stroke:"#e1e9e4","stroke-width":1.7});
+ seg(X(0)-13,Y(5),X(0)+13,Y(5),{stroke:"#ecf3e9","stroke-width":1.5});
+ seg(X(0),Y(5)-13,X(0),Y(5)+13,{stroke:"#ecf3e9","stroke-width":1.5});
+ txt(X(0)+35,Y(5)-15,"35×35 cm",{fill:"#a8c3bc","font-size":11,"text-anchor":"start"});
+ // Six boxes, left to right 1–6. Entire box is selectable.
+ for(let box=1;box<=6;box++){
+   const bx=X(-3+(box-1));
+   addSvg("rect",{x:bx,y:front,width:76,height:2.5*74,
+     fill:box===state.box?"#31533c":"#1a3c3b",stroke:box===state.box?"#c4f37d":"#759f98","stroke-width":box===state.box?3:1.4,
+     "data-box":box,style:"cursor:pointer"});
+   // Box boundary line exactly 1m apart.
+   txt(bx+38,front+2.5*74-23,String(box),{fill:box===state.box?"#dafca7":"#b3d1c9","font-weight":"700","font-size":19,style:"pointer-events:none"});
+ }
+ txt(X(0),top-23,"球場寬 6.00 m · 球場前端",{fill:"#bfdbd2","font-size":14});
+ txt(X(0),bottom+31,"投擲區深 2.50 m ｜ 第 "+state.box+" 區",{fill:"#bfdbd2","font-size":14});
+ txt(right+24,(top+bottom)/2,"",{fill:"#9dbbb4"});
+ // Dashed baseline at chosen centre x.
+ const pivotX=Number.isFinite(a.pivotX)?a.pivotX:center(state.box);
+ const pivotY=Number.isFinite(a.pivotY)?a.pivotY:-1.25;
+ const jackX=Number.isFinite(a.jackX)?a.jackX:0;
+ const jackY=Number.isFinite(a.f)?a.f:6;
+ const p={x:X(pivotX),y:Y(pivotY)},j={x:X(jackX),y:Y(jackY)};
+ if(!a.error){
+   seg(p.x,p.y,j.x,j.y,{stroke:"#c4f37d","stroke-width":4,"stroke-linecap":"round"});
+   const a0=a.now*Math.PI/180;
+   seg(p.x,p.y,p.x+Math.sin(a0)*86,p.y-Math.cos(a0)*86,{stroke:"#c1d4d1","stroke-width":2,"stroke-dasharray":"6 6"});
+ }
+ // Jack and its drag handle.
+ if(Number.isFinite(jackY)&&jackY>=0&&jackY<=10&&Math.abs(jackX)<=3){
+   addSvg("circle",{cx:j.x,cy:j.y,r:23,fill:"#f4d476","fill-opacity":".14",stroke:"#f4d476","stroke-dasharray":"3 4"});
+   addSvg("circle",{cx:j.x,cy:j.y,r:10,fill:"#f4d476",stroke:"#263332","stroke-width":3});
+   addSvg("circle",{cx:j.x,cy:j.y,r:26,fill:"transparent",stroke:"none","data-drag":"jack",style:"cursor:grab"});
+   txt(clamp(j.x+21,120,610),j.y-17,"白球",{fill:"#f4d476","font-size":12,"text-anchor":"start",style:"pointer-events:none"});
+ }
+ // Pivot appears on top of box target, with touch hit circle.
+ addSvg("circle",{cx:p.x,cy:p.y,r:21,fill:"#70bee8","fill-opacity":".18",stroke:"#70bee8","stroke-opacity":".6"});
+ addSvg("circle",{cx:p.x,cy:p.y,r:9,fill:"#70bee8",stroke:"#10242a","stroke-width":3});
+ addSvg("circle",{cx:p.x,cy:p.y,r:26,fill:"transparent","data-drag":"pivot",style:"cursor:grab"});
+ txt(p.x,p.y+37,"旋轉中心",{fill:"#a3d9f2","font-size":11,style:"pointer-events:none"});
+ // Right-side global coordinate legend.
+ txt(right+15,top+8,"↑",{fill:"#c4f37d","font-size":20,"text-anchor":"start"});
 }
-function clamp(x,a,b){return Math.min(b,Math.max(a,x));}
-function move(e){if(!map)return;var p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;var ctm=svg.getScreenCTM();if(!ctm)return;var s=p.matrixTransform(ctm.inverse());var px=clamp((s.x-350)/map.scale,-.5,.5),y=map.low+(map.bottom-s.y)/map.scale,b=clamp(-y,0,2.5);$('px').value=px.toFixed(2);$('back').value=b.toFixed(2);render();}
-svg.addEventListener('pointerdown',e=>{if(e.target.getAttribute('data-drag')!=='true')return;dragging=true;svg.setPointerCapture(e.pointerId);move(e);});
-svg.addEventListener('pointermove',e=>{if(dragging)move(e);});
-svg.addEventListener('pointerup',()=>dragging=false);svg.addEventListener('pointercancel',()=>dragging=false);
-ids.forEach(id=>{ $(id).addEventListener('input',render);$(id).addEventListener('change',render);});
-$('reset').addEventListener('click',()=>{var v={forward:5,side:0,offset:0,px:0,back:1.25,now:0};Object.entries(v).forEach(([id,value])=>$(id).value=value);render();});
+function dragWorld(e,kind){
+  const matrix=svg.getScreenCTM();if(!matrix)return;
+  const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
+  const point=pt.matrixTransform(matrix.inverse());
+  const x=invX(point.x),y=invY(point.y);
+  if(kind==="pivot"){
+    $("px").value=round2(clamp(x-center(state.box),-.5,.5)).toFixed(2);
+    $("back").value=round2(clamp(-y,0,2.5)).toFixed(2);
+  }else{
+    const xx=round2(clamp(x,-3,3));
+    $("side").value=xx===0?"0":xx<0?"-1":"1";
+    $("offset").value=Math.abs(xx).toFixed(2);
+    $("forward").value=round2(clamp(y,0,10)).toFixed(2);
+  }
+  render();
+}
+svg.addEventListener("pointerdown",e=>{
+  const target=e.target.closest("[data-drag]");
+  if(!target)return;
+  e.preventDefault();
+  state.drag=target.getAttribute("data-drag");
+  svg.setPointerCapture(e.pointerId);
+  dragWorld(e,state.drag);
+});
+svg.addEventListener("pointermove",e=>{if(state.drag)dragWorld(e,state.drag);});
+svg.addEventListener("pointerup",()=>{state.drag=null;});
+svg.addEventListener("pointercancel",()=>{state.drag=null;});
+svg.addEventListener("click",e=>{
+  if(state.drag)return;
+  const area=e.target.closest("[data-box]");
+  if(area)changeBox(Number(area.getAttribute("data-box")));
+});
+["forward","side","offset","px","back","now"].forEach(id=>{
+  $(id).addEventListener("input",render);
+  $(id).addEventListener("change",render);
+});
+$("reset").addEventListener("click",()=>{
+  state.box=3;
+  state.settings=Array.from({length:6},()=>({px:"0",back:"1.25",now:"0"}));
+  $("forward").value="6";$("side").value="0";$("offset").value="0";
+  $("px").value="0";$("back").value="1.25";$("now").value="0";
+  zoneButtons();render();
+});
+zoneButtons();
 render();
 })();
 </script></body></html>

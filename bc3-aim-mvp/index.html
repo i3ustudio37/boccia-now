@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e171b">
+<title>BC3 AIM LAB｜軌道瞄準模擬器</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;background:#0e171b;color:#e6f1eb}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}
+.shell{max-width:1260px;margin:auto;padding:20px 24px 30px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:6px 0 28px;border-bottom:1px solid #2a3f44}
+.logo{font-size:18px;font-weight:900;letter-spacing:.04em}.logo i{font-style:normal;color:#c2f56f}.tag{color:#9bb6b0;font-size:11px;letter-spacing:.13em}
+.hero{padding:36px 0 25px}.eyebrow{font-size:12px;letter-spacing:.2em;color:#bbed75;font-weight:700}
+h1{font-size:clamp(30px,4.5vw,52px);letter-spacing:-.04em;line-height:1.16;margin:12px 0}h1 em{font-style:normal;color:#bbed75}
+p{line-height:1.7;color:#9db4b6;margin:6px 0}
+.workspace{display:grid;grid-template-columns:minmax(270px,350px) minmax(0,1fr);gap:16px;align-items:start}
+.panel{background:#16242a;border:1px solid #2b4044;border-radius:18px;padding:22px;min-width:0}
+h2{margin:0 0 5px;font-size:19px}h3{font-size:14px;margin:23px 0 12px;color:#dcece3}
+small{font-size:11px;color:#829e9e}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;min-width:0;font-size:12px;color:#9eb6b7;margin:12px 0 0}
+label span{display:block;margin-bottom:7px}
+input,select{display:block;width:100%;margin:0;padding:12px 10px;border:1px solid #3b565d;border-radius:10px;background:#0c1a20;color:#eef7f3;outline:none;min-width:0}
+input:focus,select:focus{border-color:#b9eb76;box-shadow:0 0 0 2px #b9eb762a}
+.hint{font-size:12px}.pill{color:#bde77f;font-size:11px;border:1px solid #4d6e4d;border-radius:50px;padding:3px 9px}
+.sectionline{border:0;border-top:1px solid #2c4247;margin:20px 0}
+button{cursor:pointer;border:1px solid #57766a;background:#1f3635;color:#eaf6eb;padding:12px 16px;border-radius:10px;font-weight:700}
+button:hover{background:#2a4842}
+.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;color:#abc0bc;font-size:11px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}
+#court{display:block;width:100%;height:auto;background:#0d1b20;border:1px solid #2b4246;border-radius:14px;touch-action:none;user-select:none}
+.readout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.readout>div{background:#102126;border:1px solid #34504a;border-radius:12px;padding:17px}
+.readout .primary{grid-column:1/-1;background:#253a32;border-color:#567a4b}
+.readout small{display:block}.angle{display:block;font-weight:850;font-size:clamp(31px,5vw,49px);line-height:1.2;color:#c6f37f;font-variant-numeric:tabular-nums;margin:7px 0}
+.value{display:block;font-size:23px;font-weight:800;color:#e8f4ed;margin:8px 0}
+.direction{color:#b9d6bf;font-size:12px}
+.error{border:1px solid #b96557;background:#442721;color:#ffd2c7;border-radius:10px;padding:12px;margin-top:12px}
+.disclaimer{border:1px solid #40524a;background:#192a29;padding:17px 20px;margin-top:18px;border-radius:12px;color:#bdd1c9;font-size:13px}
+footer{display:flex;gap:14px;justify-content:space-between;padding:25px 0 5px;color:#6d8988;font-size:11px}
+@media(max-width:760px){.shell{padding:14px}.hero{padding:24px 2px}.workspace{grid-template-columns:1fr}.panel{padding:16px}.readout{gap:8px}.readout>div{padding:12px}footer{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav><div class="logo">5071 <i>/</i> BC3 AIM LAB</div><span class="tag">GEOMETRY MVP · v1.0</span></nav>
+<header class="hero"><div class="eyebrow">BOCCIA / RAMP ALIGNMENT</div><h1>讓每一次瞄準，<br><em>都有跡可循。</em></h1><p>已知白球座標與軌道旋轉中心位置，計算相對正前方的瞄準角度，以及從目前方向應旋轉多少度。</p></header>
+<main class="workspace">
+<section class="panel">
+<h2>01　座標設定</h2><p>距離單位：公尺（m）</p>
+<h3>🟡 白球位置 <span class="pill">TARGET</span></h3>
+<div class="field-grid">
+<label><span>前方距離 <small>由投擲區前緣起算</small></span><input id="forward" type="number" inputmode="decimal" min="0" step=".1" value="5"></label>
+<label><span>左右方向</span><select id="side"><option value="0">正中央</option><option value="1">右側</option><option value="-1">左側</option></select></label>
+</div>
+<label><span>左右距離 <small>由投擲區中線起算</small></span><input id="offset" type="number" inputmode="decimal" min="0" step=".1" value="0"></label>
+<hr class="sectionline">
+<h3>🔵 軌道旋轉中心 <span class="pill">PIVOT</span></h3>
+<div class="field-grid">
+<label><span>左右位置 <small>左負 / 右正</small></span><input id="px" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0"></label>
+<label><span>向後距離 <small>由投擲區前緣起算</small></span><input id="back" type="number" inputmode="decimal" min="0" max="2.5" step=".05" value="1.25"></label>
+</div>
+<p class="hint">旋轉中心可在 1.00 m × 2.50 m 範圍內移動，或直接拖曳右側圖中的藍點。</p>
+<hr class="sectionline">
+<h3>目前軌道方向 <span class="pill">OPTIONAL</span></h3>
+<label><span>目前角度 <small>正前方 0°；右轉＋、左轉−</small></span><input id="now" type="number" inputmode="decimal" value="0" step=".1"></label>
+<p class="hint">未量測目前方向時請保持 0°，結果即為相對正前方的旋轉量。</p>
+<button id="reset" type="button">↺ 重設示範座標</button>
+</section>
+<section class="panel">
+<div class="toolbar"><div><h2>02　瞄準俯視圖</h2><small>拖曳藍色旋轉中心可即時重算</small></div><div class="legend"><span><i class="dot" style="background:#f4d476"></i>白球</span><span><i class="dot" style="background:#72c4ee"></i>旋轉中心</span></div></div>
+<svg id="court" viewBox="0 0 700 560" aria-label="白球、投擲區、旋轉中心與瞄準線俯視圖" role="img"></svg>
+<div id="error" class="error" role="alert" hidden></div>
+<div class="readout" aria-live="polite">
+<div class="primary"><small>所需瞄準角度 · 正前方 0°</small><span class="angle" id="angle">0.00°</span><span class="direction" id="sideText">正前方</span></div>
+<div><small>相對目前方向旋轉</small><span class="value" id="delta">0.00°</span><span class="direction" id="deltaText">不需旋轉</span></div>
+<div><small>中心至白球直線距離</small><span class="value" id="distance">6.25 m</span><span class="direction">幾何直線距離</span></div>
+</div>
+<p class="hint">θ = atan2（白球左右座標 − 中心左右座標，白球前方距離 ＋ 中心向後距離）</p>
+</section>
+</main>
+<div class="disclaimer"><strong>幾何瞄準 ≠ 實際投球落點。</strong> 本 MVP 尚未納入軌道尺寸、旋轉限制、球速、坡度、摩擦、碰撞與競賽器材規範，僅供訓練研究與概念驗證。</div>
+<footer><span>5071 STUDIO / BC3 AIM LAB</span><span>投擲區：寬 1.00 m、深 2.50 m</span></footer>
+</div>
+<script>
+(function(){
+'use strict';
+var $=id=>document.getElementById(id);
+var ids=['forward','side','offset','px','back','now'];
+var svg=$('court'),ns='http://www.w3.org/2000/svg',map,dragging=false;
+function node(name,attrs,text){var e=document.createElementNS(ns,name);Object.entries(attrs||{}).forEach(([k,v])=>e.setAttribute(k,String(v)));if(text!=null)e.textContent=text;svg.append(e);return e;}
+function label(x,y,s,color,anchor){node('text',{x:x,y:y,fill:color||'#9db6b1','font-size':12,'font-family':'system-ui,sans-serif','text-anchor':anchor||'middle'},s);}
+function validNum(id){var v=$(id).value.trim();return v!==''&&Number.isFinite(Number(v))?Number(v):NaN;}
+function wrap(a){return ((a+180)%360+360)%360-180;}
+function calc(){
+ var f=validNum('forward'),o=validNum('offset'),side=validNum('side'),px=validNum('px'),b=validNum('back'),now=validNum('now');
+ var error='';
+ if([f,o,side,px,b,now].some(v=>!Number.isFinite(v)))error='請填入有效數值。';
+ else if(f<0||o<0)error='白球前方距離與左右距離不可為負數。';
+ else if(o>0&&side===0)error='左右距離大於零時，請選擇白球位於左側或右側。';
+ else if(px<-.5||px>.5||b<0||b>2.5)error='旋轉中心須在左右 ±0.50 m、向後 0～2.50 m 範圍內。';
+ var tx=o*side,dx=tx-px,dy=f+b,d=Math.hypot(dx,dy);
+ if(!error&&d<1e-9)error='白球與旋轉中心重合，無法定義瞄準方向。';
+ var angle=!error?Math.atan2(dx,dy)*180/Math.PI:NaN,delta=!error?wrap(angle-now):NaN;
+ return {f:f,o:o,tx:tx,px:px,b:b,now:now,angle:angle,delta:delta,d:d,error:error};
+}
+function signed(v){return (v>0?'+':'')+v.toFixed(2)+'°';}
+function render(){
+ var a=calc();
+ $('error').hidden=!a.error;$('error').textContent=a.error;
+ $('angle').textContent=a.error?'—':signed(a.angle);
+ $('sideText').textContent=a.error?'請修正座標':Math.abs(a.angle)<.005?'正前方 / 不需偏轉':a.angle>0?'右轉 / 順時針':'左轉 / 逆時針';
+ $('delta').textContent=a.error?'—':signed(a.delta);
+ $('deltaText').textContent=a.error?'':Math.abs(a.delta)<.005?'不需旋轉':a.delta>0?'順時針右轉':'逆時針左轉';
+ $('distance').textContent=a.error?'—':a.d.toFixed(2)+' m';
+ draw(a);
+}
+function draw(a){
+ svg.replaceChildren();
+ var f=Number.isFinite(a.f)?Math.max(0,a.f):5;
+ var tx=Number.isFinite(a.tx)?a.tx:0,px=Number.isFinite(a.px)?a.px:0,b=Number.isFinite(a.b)?a.b:1.25;
+ var bound=Math.max(2.2,Math.abs(tx)+1,Math.abs(px)+1),low=-2.9,high=Math.max(3.25,f+.75),left=66,right=635,top=28,bottom=516;
+ var scale=Math.min((right-left)/(2*bound),(bottom-top)/(high-low));
+ var X=x=>350+x*scale,Y=y=>bottom-(y-low)*scale;
+ map={X:X,Y:Y,scale:scale,low:low,bottom:bottom};
+ for(var i=0;i<=Math.ceil(high);i++){var yy=Y(i);node('line',{x1:left,y1:yy,x2:right,y2:yy,stroke:'#294047','stroke-dasharray':'4 8'});label(left-8,yy+4,i+' m','#718f92','end');}
+ node('line',{x1:X(0),y1:Y(low),x2:X(0),y2:Y(high),stroke:'#6c8680','stroke-dasharray':'6 8'});
+ node('rect',{x:X(-.5),y:Y(0),width:scale,height:2.5*scale,fill:'#234b45','fill-opacity':'.7',stroke:'#83b89f','stroke-width':2});
+ node('line',{x1:X(-.5),y1:Y(0),x2:X(.5),y2:Y(0),stroke:'#c2f47c','stroke-width':3});
+ label(X(0),Y(0)-10,'投擲區前緣','#d5f69d');
+ label(X(0),Y(-2.5)+20,'寬 1.00 m / 深 2.50 m','#9cb7ad');
+ var p={x:X(px),y:Y(-b)},t={x:X(tx),y:Y(f)};
+ if(!a.error){
+  node('line',{x1:p.x,y1:p.y,x2:t.x,y2:t.y,stroke:'#c2f47c','stroke-width':3.5,'stroke-linecap':'round'});
+  var rad=a.now*Math.PI/180,ray=Math.max(35,Math.min(90,scale*1.8));
+  node('line',{x1:p.x,y1:p.y,x2:p.x+ray*Math.sin(rad),y2:p.y-ray*Math.cos(rad),stroke:'#b0c3c5','stroke-dasharray':'5 6'});
+  node('circle',{cx:t.x,cy:t.y,r:21,fill:'none',stroke:'#f4d476','stroke-opacity':'.4','stroke-dasharray':'3 4'});
+  node('circle',{cx:t.x,cy:t.y,r:11,fill:'#f4d476',stroke:'#152222','stroke-width':3});
+  label(Math.min(630,t.x+20),t.y-16,'白球','#f4d476','start');
+  var steps=Math.max(2,Math.ceil(Math.abs(a.angle)/5)),path='';
+  for(var k=0;k<=steps;k++){var ar=a.angle*Math.PI/180*k/steps;path+=(k?'L':'M')+(p.x+45*Math.sin(ar))+' '+(p.y-45*Math.cos(ar))+' ';}
+  node('path',{d:path,fill:'none',stroke:'#c2f47c','stroke-width':2});
+ }
+ node('circle',{cx:p.x,cy:p.y,r:21,fill:'#70bee8','fill-opacity':'.2',stroke:'#70bee8','stroke-opacity':'.6'});
+ node('circle',{cx:p.x,cy:p.y,r:9,fill:'#70bee8',stroke:'#0b1b20','stroke-width':3});
+ node('circle',{cx:p.x,cy:p.y,r:28,fill:'transparent','data-drag':'true',style:'cursor:grab'});
+ label(p.x+16,p.y+35,'旋轉中心','#92d2f1','start');
+ label(350,17,'↑　球場前方','#b6d4c4');
+}
+function clamp(x,a,b){return Math.min(b,Math.max(a,x));}
+function move(e){if(!map)return;var p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;var ctm=svg.getScreenCTM();if(!ctm)return;var s=p.matrixTransform(ctm.inverse());var px=clamp((s.x-350)/map.scale,-.5,.5),y=map.low+(map.bottom-s.y)/map.scale,b=clamp(-y,0,2.5);$('px').value=px.toFixed(2);$('back').value=b.toFixed(2);render();}
+svg.addEventListener('pointerdown',e=>{if(e.target.getAttribute('data-drag')!=='true')return;dragging=true;svg.setPointerCapture(e.pointerId);move(e);});
+svg.addEventListener('pointermove',e=>{if(dragging)move(e);});
+svg.addEventListener('pointerup',()=>dragging=false);svg.addEventListener('pointercancel',()=>dragging=false);
+ids.forEach(id=>{ $(id).addEventListener('input',render);$(id).addEventListener('change',render);});
+$('reset').addEventListener('click',()=>{var v={forward:5,side:0,offset:0,px:0,back:1.25,now:0};Object.entries(v).forEach(([id,value])=>$(id).value=value);render();});
+render();
+})();
+</script></body></html>

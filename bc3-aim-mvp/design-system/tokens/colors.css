@@ -1,0 +1,117 @@
+/* ============================================================
+   5071 — COLOR TOKENS
+   Brand: charcoal ink, crimson, white.
+   Dark-first (the training product is dark); light scope provided.
+   ============================================================ */
+
+:root {
+  /* ---- Brand primitives (from brand guide) ---- */
+  --brand-ink:     #1A1A19; /* near-black charcoal */
+  --brand-crimson: #DC1045; /* C7 M98 Y61 K0 */
+  --brand-white:   #FFFFFF;
+
+  /* ---- Neutral ramp (neutral charcoal, toward brand ink) ---- */
+  --n-0:   #FFFFFF;
+  --n-50:  #F6F6F5;
+  --n-100: #EDEDEC;
+  --n-200: #DCDCDA;
+  --n-300: #C0C0BE;
+  --n-400: #9C9C99;
+  --n-500: #767674;
+  --n-600: #575755;
+  --n-700: #3D3D3B;
+  --n-800: #2A2A28;
+  --n-900: #1A1A19; /* == brand ink */
+  --n-950: #0E0E0D; /* deepest surface */
+
+  /* ---- Crimson ramp ---- */
+  --crimson-50:  #FDE8ED;
+  --crimson-100: #FBC6D3;
+  --crimson-200: #F79BB3;
+  --crimson-300: #F26088;
+  --crimson-400: #E8467A;
+  --crimson-500: #DC1045; /* brand */
+  --crimson-600: #C10D3C;
+  --crimson-700: #9E0A31;
+  --crimson-800: #7A0826;
+
+  /* ---- Support hues (muted, no neon) ---- */
+  --green-500:  #1E9E63;
+  --green-600:  #167A4C;
+  --amber-500:  #E8A33D;
+  --amber-600:  #C9862A;
+  --steel-500:  #3E7CB1; /* info / data secondary */
+  --steel-600:  #2F6293;
+
+  /* ============================================================
+     SEMANTIC ALIASES — DARK (default)
+     ============================================================ */
+  --bg:            var(--n-950);
+  --bg-elevated:   var(--n-900);
+  --surface:       #1F1F1E;
+  --surface-2:     #272726;
+  --surface-3:     #333331;
+  --surface-inset: #141413;
+
+  --border:        rgba(255,255,255,0.10);
+  --border-strong: rgba(255,255,255,0.18);
+  --border-accent: var(--crimson-500);
+
+  --text:          #F6F6F5;
+  --text-muted:    #ABABA8;
+  --text-subtle:   #82827F;
+  --text-inverse:  #1A1A19;
+
+  --accent:        var(--crimson-500);
+  --accent-hover:  var(--crimson-400);
+  --accent-press:  var(--crimson-600);
+  --accent-soft:   rgba(220,16,69,0.14);
+  --on-accent:     #FFFFFF;
+
+  --success:       var(--green-500);
+  --warning:       var(--amber-500);
+  --danger:        var(--crimson-500);
+  --info:          var(--steel-500);
+
+  --focus-ring:    rgba(220,16,69,0.45);
+  --overlay:       rgba(8,8,7,0.66);
+
+  /* on-surface data grid line for charts */
+  --grid-line:     rgba(255,255,255,0.07);
+}
+
+/* ============================================================
+   SEMANTIC ALIASES — LIGHT
+   ============================================================ */
+[data-theme="light"] {
+  --bg:            var(--n-50);
+  --bg-elevated:   var(--n-0);
+  --surface:       #FFFFFF;
+  --surface-2:     #F6F6F5;
+  --surface-3:     #EDEDEC;
+  --surface-inset: #F0F0EE;
+
+  --border:        rgba(26,26,25,0.12);
+  --border-strong: rgba(26,26,25,0.22);
+  --border-accent: var(--crimson-500);
+
+  --text:          #1A1A19;
+  --text-muted:    #575755;
+  --text-subtle:   #9C9C99;
+  --text-inverse:  #FFFFFF;
+
+  --accent:        var(--crimson-500);
+  --accent-hover:  var(--crimson-600);
+  --accent-press:  var(--crimson-700);
+  --accent-soft:   rgba(220,16,69,0.10);
+  --on-accent:     #FFFFFF;
+
+  --success:       var(--green-600);
+  --warning:       var(--amber-600);
+  --danger:        var(--crimson-600);
+  --info:          var(--steel-600);
+
+  --focus-ring:    rgba(220,16,69,0.35);
+  --overlay:       rgba(26,26,25,0.42);
+  --grid-line:     rgba(26,26,25,0.08);
+}

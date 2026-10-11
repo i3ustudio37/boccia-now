@@ -30,8 +30,8 @@
     if(text!=null)n.textContent=text;
     svg.append(n);return n;
   };
-  const line=(x1,y1,x2,y2,extra={})=>attrs("line",{x1,y1,x2,y2,stroke:"#4d6464","stroke-width":1,...extra});
-  const text=(x,y,s,extra={})=>attrs("text",{x,y,fill:"#a0b7ae","text-anchor":"middle","font-size":13,"font-family":"system-ui,sans-serif",...extra},s);
+  const line=(x1,y1,x2,y2,extra={})=>attrs("line",{x1,y1,x2,y2,stroke:"var(--n-600)","stroke-width":1,...extra});
+  const text=(x,y,s,extra={})=>attrs("text",{x,y,fill:"var(--text-muted)","text-anchor":"middle","font-size":13,"font-family":"system-ui,sans-serif",...extra},s);
   function readPivotInput(){
     state.pivot[state.selected-1] = {x:$("pivotX").value,back:$("pivotBack").value,angle:$("currentAngle").value};
   }
@@ -104,38 +104,38 @@
     svg.replaceChildren();
     // Court = 6m x 12.5m, including throwing boxes.
     const L=X(-3),R=X(3),T=Y(10),F=Y(0),B=Y(-2.5);
-    attrs("rect",{x:L,y:T,width:R-L,height:B-T,fill:"#173137",stroke:"#aacac0","stroke-width":3});
+    attrs("rect",{x:L,y:T,width:R-L,height:B-T,fill:"var(--surface-inset)",stroke:"var(--n-400)","stroke-width":3});
     if(state.showGrid){
       for(let n=0;n<=10;n+=2){
-        line(L,Y(n),R,Y(n),{stroke:n===0?"#c7f28a":"#315157","stroke-width":n===0?2.5:1,"stroke-dasharray":n===0?"none":"4 7"});
-        text(L-22,Y(n)+5,n+"m",{fill:"#9fb5b0"});
+        line(L,Y(n),R,Y(n),{stroke:n===0?"var(--n-200)":"var(--n-700)","stroke-width":n===0?2.5:1,"stroke-dasharray":n===0?"none":"4 7"});
+        text(L-22,Y(n)+5,n+"m",{fill:"var(--text-subtle)"});
       }
-      for(let n=-2;n<=2;n+=1)line(X(n),T,X(n),F,{stroke:"#2a484b","stroke-dasharray":"4 10"});
-      line(X(0),T,X(0),F,{stroke:"#496b64","stroke-dasharray":"6 9"});
+      for(let n=-2;n<=2;n+=1)line(X(n),T,X(n),F,{stroke:"var(--n-800)","stroke-dasharray":"4 10"});
+      line(X(0),T,X(0),F,{stroke:"var(--n-600)","stroke-dasharray":"6 9"});
     }
     if(state.showV){
       const vertices=[[-3,0],[-3,3],[0,1.5],[3,3],[3,0]].map(([x,y])=>X(x)+","+Y(y)).join(" ");
-      attrs("polygon",{points:vertices,fill:"#a57b53","fill-opacity":".13"});
-      attrs("polyline",{points:[[-3,3],[0,1.5],[3,3]].map(([x,y])=>X(x)+","+Y(y)).join(" "),stroke:"#f0ad7f",fill:"none","stroke-width":3.5});
-      text(X(0),Y(1.5)+30,"V 字線",{fill:"#f5be91","font-size":12});
+      attrs("polygon",{points:vertices,fill:"var(--warning)","fill-opacity":".13"});
+      attrs("polyline",{points:[[-3,3],[0,1.5],[3,3]].map(([x,y])=>X(x)+","+Y(y)).join(" "),stroke:"var(--warning)",fill:"none","stroke-width":3.5});
+      text(X(0),Y(1.5)+30,"V 字線",{fill:"var(--n-300)","font-size":12});
     }
     // The penalty cross and 35cm x 35cm marked target.
     const square=.35*70;
-    attrs("rect",{x:X(0)-square/2,y:Y(5)-square/2,width:square,height:square,stroke:"#d7eee6",fill:"none","stroke-width":2});
-    line(X(0)-14,Y(5),X(0)+14,Y(5),{stroke:"#e2f1ea","stroke-width":2});
-    line(X(0),Y(5)-14,X(0),Y(5)+14,{stroke:"#e2f1ea","stroke-width":2});
-    text(R-3,T-16,"← 6.00 m →",{fill:"#afc9c0","text-anchor":"end","font-size":12});
+    attrs("rect",{x:X(0)-square/2,y:Y(5)-square/2,width:square,height:square,stroke:"var(--n-200)",fill:"none","stroke-width":2});
+    line(X(0)-14,Y(5),X(0)+14,Y(5),{stroke:"var(--n-200)","stroke-width":2});
+    line(X(0),Y(5)-14,X(0),Y(5)+14,{stroke:"var(--n-200)","stroke-width":2});
+    text(R-3,T-16,"← 6.00 m →",{fill:"var(--n-300)","text-anchor":"end","font-size":12});
     // Box overlays, full-bounds clickable (each 1m x 2.5m).
     for(let b=1;b<=6;b++){
       attrs("rect",{x:X(-3+b-1),y:F,width:70,height:B-F,
-        fill:state.selected===b?"#385a3b":"#224443",
-        stroke:state.selected===b?"#c5f47f":"#699b91",
+        fill:state.selected===b?"var(--surface-3)":"var(--surface-2)",
+        stroke:state.selected===b?"var(--accent)":"var(--n-500)",
         "stroke-width":state.selected===b?3:1.2,
         "data-box":b,style:"cursor:pointer"});
-      text(X(CX(b)),B-19,String(b),{"font-size":22,"font-weight":800,fill:state.selected===b?"#e0f7ac":"#b1cbc4",style:"pointer-events:none"});
+      text(X(CX(b)),B-19,String(b),{"font-size":22,"font-weight":800,fill:state.selected===b?"var(--text)":"var(--n-300)",style:"pointer-events:none"});
     }
-    text(X(0),B+31,"1 → 6 號投擲區　|　2.50 m",{fill:"#b2cec4","font-size":12});
-    text(X(0),T-38,"球場前端",{fill:"#a7c4b9","font-size":12});
+    text(X(0),B+31,"1 → 6 號投擲區　|　2.50 m",{fill:"var(--n-300)","font-size":12});
+    text(X(0),T-38,"球場前端",{fill:"var(--text-muted)","font-size":12});
     // Main aim and direction.
     const pivotX=Number.isFinite(a.px)?a.px:CX(state.selected),
           pivotY=Number.isFinite(a.py)?a.py:-1.25;
@@ -143,22 +143,22 @@
           jackY=Number.isFinite(a.j.y)?a.j.y:6;
     const p={x:X(pivotX),y:Y(pivotY)},j={x:X(jackX),y:Y(jackY)};
     if(!a.error){
-      line(p.x,p.y,j.x,j.y,{stroke:"#c5f47f","stroke-width":4,"stroke-linecap":"round"});
+      line(p.x,p.y,j.x,j.y,{stroke:"var(--accent)","stroke-width":4,"stroke-linecap":"round"});
       if(state.showHeading){
         const theta=safeNum(state.pivot[state.selected-1].angle)*Math.PI/180;
-        line(p.x,p.y,p.x+Math.sin(theta)*88,p.y-Math.cos(theta)*88,{stroke:"#e5f0e8","stroke-width":2,"stroke-dasharray":"5 6"});
+        line(p.x,p.y,p.x+Math.sin(theta)*88,p.y-Math.cos(theta)*88,{stroke:"var(--n-300)","stroke-width":2,"stroke-dasharray":"5 6"});
       }
     }
     if(jackX>=-3&&jackX<=3&&jackY>=0&&jackY<=10){
-      attrs("circle",{cx:j.x,cy:j.y,r:20,fill:"#ffdb82","fill-opacity":".17",stroke:"#f6d47b","stroke-dasharray":"3 4"});
-      attrs("circle",{cx:j.x,cy:j.y,r:10,fill:"#ffdb82",stroke:"#1f3032","stroke-width":2.5});
+      attrs("circle",{cx:j.x,cy:j.y,r:20,fill:"var(--warning)","fill-opacity":".17",stroke:"var(--warning)","stroke-dasharray":"3 4"});
+      attrs("circle",{cx:j.x,cy:j.y,r:10,fill:"var(--warning)",stroke:"var(--surface-inset)","stroke-width":2.5});
       attrs("circle",{cx:j.x,cy:j.y,r:29,fill:"transparent","data-drag":"jack",style:"cursor:grab"});
-      text(clamp(j.x+22,100,485),j.y-22,"白球",{fill:"#ffdb82","text-anchor":"start","font-size":13,style:"pointer-events:none"});
+      text(clamp(j.x+22,100,485),j.y-22,"白球",{fill:"var(--warning)","text-anchor":"start","font-size":13,style:"pointer-events:none"});
     }
-    attrs("circle",{cx:p.x,cy:p.y,r:22,fill:"#7bc8ed","fill-opacity":".18",stroke:"#7bc8ed","stroke-opacity":".65"});
-    attrs("circle",{cx:p.x,cy:p.y,r:9,fill:"#7bc8ed",stroke:"#0b1d23","stroke-width":2.5});
+    attrs("circle",{cx:p.x,cy:p.y,r:22,fill:"var(--info)","fill-opacity":".18",stroke:"var(--info)","stroke-opacity":".65"});
+    attrs("circle",{cx:p.x,cy:p.y,r:9,fill:"var(--info)",stroke:"var(--surface-inset)","stroke-width":2.5});
     attrs("circle",{cx:p.x,cy:p.y,r:32,fill:"transparent","data-drag":"pivot",style:"cursor:grab"});
-    text(p.x,p.y+39,"中心",{fill:"#91d8fb","font-size":12,style:"pointer-events:none"});
+    text(p.x,p.y+39,"中心",{fill:"var(--text-muted)","font-size":12,style:"pointer-events:none"});
   }
   function render(){
     readPivotInput();

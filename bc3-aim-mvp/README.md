@@ -63,3 +63,12 @@ P = (xc + dx, −b)
 - Vercel 專案：bc3-aim-lab，Root Directory 為 bc3-aim-mvp。
 - Production branch：main。Framework：Other。
 - GitHub main 更新後，Vercel 自動部署。
+
+
+## 5071 Design System 統一視覺（v3.2）
+
+- 設計來源：[`5071-open-design-system`](https://github.com/i3ustudio37/5071-open-design-system)，固定版本 `8aa3d74b7e0d`。
+- 以完整官方 CSS token 入口 `design-system/styles.css` 載入原始 `tokens/*.css`；採用其深色語意色、緋紅單一主要強調、Saira／Saira Condensed／JetBrains Mono 字體、4 px spacing 與 10/14 px 圓角。
+- 標頭引用上述固定版本之**官方白色橫式 Logo**，不自行重繪。
+- 應使用者指定，四個座標欄位維持淡藍底作為功能性資訊輸入的特殊處理，其他元件採原廠灰階／緋紅色規範。
+- 右側在桌面視窗為最小 204 px、最大 252 px 的窄控制面板，其餘空間給左側球場；手機維持左右並排。頁面固定視窗高度不整頁捲動，進階對話框必要時可自行捲動。

@@ -1,0 +1,42 @@
+/* ============================================================
+   5071 — ELEVATION & MOTION
+   Shadows are cool/neutral and restrained (no glow, no neon).
+   A dedicated crimson-tinted shadow is used ONLY for the
+   primary CTA to lift it off dark surfaces.
+   ============================================================ */
+
+:root {
+  /* Neutral elevation (dark UI reads mostly via borders + fills;
+     shadows stay subtle) */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.30);
+  --shadow-sm:  0 2px 6px rgba(0,0,0,0.35);
+  --shadow-md:  0 6px 18px rgba(0,0,0,0.40);
+  --shadow-lg:  0 16px 40px rgba(0,0,0,0.48);
+  --shadow-xl:  0 28px 70px rgba(0,0,0,0.55);
+
+  /* Accent lift for primary actions */
+  --shadow-accent: 0 8px 24px rgba(220,16,69,0.32);
+
+  /* Inset for pressed / track wells */
+  --shadow-inset: inset 0 1px 2px rgba(0,0,0,0.35);
+
+  /* Motion — snappy + athletic. Short durations, decisive easing.
+     No bounce, no long fades. */
+  --dur-fast:   120ms; /* @kind other */
+  --dur-base:   180ms; /* @kind other */
+  --dur-slow:   280ms; /* @kind other */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);   /* @kind other */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* @kind other */
+
+  /* Press feedback */
+  --press-scale: 0.97; /* @kind other */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms; /* @kind other */
+    --dur-base: 0ms; /* @kind other */
+    --dur-slow: 0ms; /* @kind other */
+  }
+}

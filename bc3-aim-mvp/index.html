@@ -5,21 +5,22 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b161b">
 <meta name="description" content="BC3 六投擲區軌道瞄準模擬器，單頁無捲動。">
-<title>BC3 AIM LAB | 軌道瞄準工作台</title>
+<title>BC3 AIM LAB | 5071 單頁瞄準工作台</title>
+<link rel="stylesheet" href="./design-system/styles.css">
 <link rel="stylesheet" href="./studio.css">
 <script defer src="./studio.js"></script>
 </head>
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="identity"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><div><strong>5071 <em>/</em> BC3 AIM LAB</strong><small>BOCCIA RAMP ALIGNMENT</small></div></div>
-  <button id="settingsBtn" class="tool" type="button" aria-haspopup="dialog" aria-controls="settingsDialog">⚙ 進階設定</button>
+  <div class="identity"><img class="official-logo" src="https://raw.githubusercontent.com/i3ustudio37/5071-open-design-system/8aa3d74b7e0daa02245e3a7ad8cd75e0624be16c/assets/logo/logo-horizontal-white.png" alt="5071 官方標誌" width="68" height="28"><span class="identity-divider" aria-hidden="true"></span><div><strong>BC3 AIM LAB</strong><small>RAMP AIMING SIMULATOR · 5071</small></div></div>
+  <button id="settingsBtn" class="tool" type="button" aria-haspopup="dialog" aria-controls="settingsDialog">進階設定</button>
 </header>
 <main class="workspace">
   <section class="panel court-pane" aria-label="完整地板滾球場地">
-    <div class="court-head"><div><h1>完整球場</h1><small>6.00 × 12.50 m ｜ 六個投擲區</small></div></div>
+    <div class="court-head"><div><h1>完整球場 <span class="court-badge">6 BOXES</span></h1><small>6.00 × 12.50 m · WORLD BOCCIA COURT</small></div></div>
     <div class="court-stage">
-      <svg id="court" viewBox="42 0 486 1020" preserveAspectRatio="xMidYMid meet" role="img" aria-label="完整地板滾球場地俯視圖，含六個投擲區、V字線、十字標記、白球及瞄準線。"></svg>
+      <svg id="court" viewBox="52 0 472 1010" preserveAspectRatio="xMidYMid meet" role="img" aria-label="完整地板滾球場地俯視圖，含六個投擲區、V字線、十字標記、白球及瞄準線。"></svg>
     </div>
     <div class="court-foot"><span><strong>●</strong> 黃色＝白球　<strong>●</strong> 藍色＝旋轉中心</span><span>可拖曳定位</span></div>
   </section>
@@ -45,19 +46,19 @@
     </section>
     <section class="panel results-pane" aria-label="即時瞄準結果">
       <div class="result-head">瞄準結果 <small id="boxReadout">第 3 投擲區</small></div>
-      <div class="main-result"><div class="eyebrow">相對正前方瞄準角度</div><div class="degrees" id="aimAngle" aria-live="polite">—</div><div id="aimDir" class="result-direction">計算中…</div></div>
+      <div class="main-result"><div class="eyebrow">相對正前方瞄準角度</div><div class="degrees metric" id="aimAngle" aria-live="polite">—</div><div id="aimDir" class="result-direction">計算中…</div></div>
       <div class="secondary-result"><span>相對目前方向旋轉</span><strong id="rotateBy">—</strong><small id="rotateDir">—</small></div>
       <div class="small-results"><div><small>直線距離</small><strong id="distance">—</strong></div><div><small>白球 X, Y</small><strong id="globalJack">—</strong></div><div><small>底座 X, Y</small><strong id="globalPivot">—</strong></div></div>
       <div id="inputError" class="error" role="alert" hidden></div>
       <div id="jackState" class="jack-state" role="status" hidden></div>
-      <button id="compareBtn" type="button" class="advanced-link">六區比較與進階設定　↗</button>
+      <button id="compareBtn" type="button" class="advanced-link">六區比較 / 設定</button>
     </section>
   </aside>
 </main>
 </div>
 <dialog id="settingsDialog" aria-label="六區比較與進階設定">
   <div class="modal-inner">
-    <div class="modal-head"><div><h2>進階設定</h2><p>設定目前軌道方向、查看六區角度比較與場地顯示選項。</p></div><button id="modalClose" type="button" class="close" aria-label="關閉">×</button></div>
+    <div class="modal-head"><div><h2>進階設定 <span class="modal-label">5071</span></h2><p>設定目前軌道方向、查看六區角度比較與場地顯示選項。</p></div><button id="modalClose" type="button" class="close" aria-label="關閉">×</button></div>
     <div class="advanced-section">
       <h3>目前軌道角度（所選投擲區）</h3>
       <label class="advanced-input" for="currentAngle">目前角度 θ₀ <small>正前方 0°，向右為正，向左為負</small><div class="input-wrap"><input id="currentAngle" name="currentAngle" type="number" inputmode="decimal" step=".1" value="0.00"><i>°</i></div></label>

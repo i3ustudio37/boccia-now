@@ -84,6 +84,10 @@
       status.className="jack-state"+(invalid?" warn":"");
       status.textContent=invalid?"白球中心位於 V 字線或後方的無效區（僅作幾何提醒）。":"白球中心在 V 字線前方（未計球體半徑及標線寬度）。";
     } else status.hidden=true;
+    $("modalDistance").textContent=$("distance").textContent;
+    $("modalJack").textContent=$("globalJack").textContent;
+    $("modalPivot").textContent=$("globalPivot").textContent;
+    $("modalJackStatus").textContent=status.hidden?"白球位置超出球場或資料不完整。":status.textContent;
     $("boxSelect").value=String(state.selected);
   }
   function renderComparison(){

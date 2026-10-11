@@ -28,21 +28,21 @@
     <section class="panel selected-pane">
       <label for="boxSelect">投擲區</label>
       <select id="boxSelect" aria-label="選擇投擲區">
-        <option value="1">第 1 投擲區</option>
-        <option value="2">第 2 投擲區</option>
-        <option value="3" selected>第 3 投擲區</option>
-        <option value="4">第 4 投擲區</option>
-        <option value="5">第 5 投擲區</option>
-        <option value="6">第 6 投擲區</option>
+        <option value="1">第 1 區</option>
+        <option value="2">第 2 區</option>
+        <option value="3" selected>第 3 區</option>
+        <option value="4">第 4 區</option>
+        <option value="5">第 5 區</option>
+        <option value="6">第 6 區</option>
       </select>
     </section>
     <section class="panel coordinates-pane" aria-label="座標數值輸入">
       <div class="group-label"><i class="pip yellow"></i><strong>白球位置</strong><small>全場座標</small></div>
-      <label for="jackForward" class="coordinate-row"><span>白球・前後距離 <small>前方為正，0～10 m</small></span><div class="input-wrap"><input id="jackForward" name="jackForward" type="number" inputmode="decimal" min="0" max="10" step=".05" value="6.00"><i>m</i></div></label>
-      <label for="jackX" class="coordinate-row"><span>白球・左右距離 <small>左 − ／右 ＋，±3 m</small></span><div class="input-wrap"><input id="jackX" name="jackX" type="number" inputmode="decimal" min="-3" max="3" step=".05" value="0.00"><i>m</i></div></label>
+      <label for="jackForward" class="coordinate-row"><span>白球・前後 <small>前方為正，0～10 m</small></span><div class="input-wrap"><input id="jackForward" name="jackForward" type="number" inputmode="decimal" min="0" max="10" step=".05" value="6.00"><i>m</i></div></label>
+      <label for="jackX" class="coordinate-row"><span>白球・左右 <small>左 − ／右 ＋，±3 m</small></span><div class="input-wrap"><input id="jackX" name="jackX" type="number" inputmode="decimal" min="-3" max="3" step=".05" value="0.00"><i>m</i></div></label>
       <div class="group-label base-group"><i class="pip blue"></i><strong>底座中心</strong><small>相對所選區域</small></div>
-      <label for="pivotX" class="coordinate-row"><span>底座・左右位置 <small>左 − ／右 ＋，±0.5 m</small></span><div class="input-wrap"><input id="pivotX" name="pivotX" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0.00"><i>m</i></div></label>
-      <label for="pivotBack" class="coordinate-row"><span>底座・前後位置 <small>由投擲線向後 0～2.5 m</small></span><div class="input-wrap"><input id="pivotBack" name="pivotBack" type="number" inputmode="decimal" min="0" max="2.5" step=".05" value="1.25"><i>m</i></div></label>
+      <label for="pivotX" class="coordinate-row"><span>底座・左右 <small>左 − ／右 ＋，±0.5 m</small></span><div class="input-wrap"><input id="pivotX" name="pivotX" type="number" inputmode="decimal" min="-.5" max=".5" step=".05" value="0.00"><i>m</i></div></label>
+      <label for="pivotBack" class="coordinate-row"><span>底座・前後 <small>由投擲線向後 0～2.5 m</small></span><div class="input-wrap"><input id="pivotBack" name="pivotBack" type="number" inputmode="decimal" min="0" max="2.5" step=".05" value="1.25"><i>m</i></div></label>
     </section>
     <section class="panel results-pane" aria-label="即時瞄準結果">
       <div class="result-head">瞄準結果 <small id="boxReadout">第 3 投擲區</small></div>
@@ -68,6 +68,13 @@
       <label class="setting-row" for="showGrid">顯示球場公尺網格 <input id="showGrid" type="checkbox" checked></label>
       <label class="setting-row" for="showV">顯示 V 字線與白球無效區 <input id="showV" type="checkbox" checked></label>
       <label class="setting-row" for="showHeading">顯示目前軌道方向參考線 <input id="showHeading" type="checkbox" checked></label>
+    </div>
+    <div class="advanced-section">
+      <h3>目前幾何數據</h3>
+      <div class="detail-row"><span>中心至白球距離</span><strong id="modalDistance">—</strong></div>
+      <div class="detail-row"><span>白球全場 X, Y</span><strong id="modalJack">—</strong></div>
+      <div class="detail-row"><span>底座全場 X, Y</span><strong id="modalPivot">—</strong></div>
+      <p class="reference" id="modalJackStatus">白球位置判定資訊</p>
     </div>
     <div class="advanced-section">
       <h3>座標定義</h3>
